@@ -2,14 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import Layout from '@/layout/index.vue'
 import home from './modules/home'
-import notify from './modules/notify'
-import administration from './modules/administration'
-import monitoring from './modules/monitoring'
+import product from './modules/product'
+import user from './modules/user'
 import dashboard from './modules/dashboard'
-import explanationSupport from './modules/explanation-support'
-import reconciliation from './modules/reconciliation'
-import collection from './modules/collection'
-import statisticalReport from './modules/statistical-report'
+import order from './modules/order'
 
 export const constantRoutes = [
   {
@@ -88,14 +84,10 @@ export const constantRoutes = [
 ]
 export const asyncRoutes = [
   home,
-  collection,
-  reconciliation,
-  monitoring,
-  statisticalReport,
   dashboard,
-  administration,
-  notify,
-  explanationSupport,
+  product,
+  order,
+  user,
   {
     path: '/:pathMatch(.*)*',
     redirect: '/404',

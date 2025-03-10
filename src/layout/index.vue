@@ -50,7 +50,6 @@ import {
 import { NavBar, AppMain, SideBar, TagsView, Settings, IdleCheck } from './components'
 import { toggleClass } from '@/utils/el'
 import { useEventListener } from '@vueuse/core'
-import { apiGetRouteUser } from '@/api/expressway'
 
 import { useRoute } from 'vue-router'
 import {
@@ -58,8 +57,6 @@ import {
   useSettingsStore,
   useUserStore,
   usePermissionStore,
-  useCommonStore,
-  useSearchStore,
 } from '@/store'
 import MilestoneConnect from '@/milestone/connect'
 import MilestoneConnectTunnel from '@/milestone/connectTunnel'
@@ -71,8 +68,6 @@ const settingsStore = useSettingsStore()
 const userStore = useUserStore()
 const permissionStore = usePermissionStore()
 const route = useRoute()
-const commonStore = useCommonStore()
-const searchStore = useSearchStore()
 
 const hiddenMainContainer = 'hidden-main-container'
 

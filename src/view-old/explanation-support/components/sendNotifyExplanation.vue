@@ -83,11 +83,10 @@
 import { onMounted, ref, reactive } from 'vue'
 import { useI18n } from '@/locale'
 import { ElMessage } from 'element-plus'
-import { useExplanationSupportStore, useAdministrativeDepartmentStore } from '@/store'
+import { useExplanationSupportStore } from '@/store'
 
 const { t } = useI18n()
 const explanationSupportStore = useExplanationSupportStore()
-const administrativeDepartmentStore = useAdministrativeDepartmentStore()
 
 const props = defineProps({
   explanationId: {

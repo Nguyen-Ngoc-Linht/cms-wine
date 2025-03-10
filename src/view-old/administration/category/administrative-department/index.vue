@@ -3,7 +3,7 @@ import { computed, reactive, ref, onMounted } from 'vue'
 import { useI18n } from '@/locale'
 import lang from '@/locale/getMessage'
 import { useRouter } from 'vue-router'
-import { useAdministrativeDepartmentStore, useAppStore } from '@/store'
+import { useAppStore } from '@/store'
 import ListUnitDepartment from '@/views/administration/category/administrative-department/components/listUnitDepartment.vue'
 import Dialog from '@/components/Dialog/index.vue'
 import AdministrativeDepartmentDetail from '@/views/administration/category/administrative-department/components/unitDepartmentDetail.vue'
@@ -17,7 +17,6 @@ defineOptions({
 const router = useRouter()
 const { t } = useI18n()
 const appStore = useAppStore()
-const administrativeDepartmentStore = useAdministrativeDepartmentStore()
 const locale = computed(() => lang[appStore.lang])
 
 const listUnitDepartment = ref([])

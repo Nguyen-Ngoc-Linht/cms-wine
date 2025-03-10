@@ -1,11 +1,11 @@
 import Layout from '@/layout/index.vue'
 
 export default {
-  path: '/dashboard',
-  name: 'dashboard',
+  path: '/order',
+  name: 'order',
   component: Layout,
   meta: {
-    title: 'Dashboard',
+    title: 'Đơn hàng',
     icon: 'icon-menu-device',
     noCache: false,
     permissions: ['/dashboard'],
@@ -14,10 +14,10 @@ export default {
   children: [
     {
       path: '',
-      name: 'dashboard',
-      component: () => import('@/views/dashboard/index.vue'),
+      name: 'order-manage',
+      component: () => import('@/views/order/index.vue'),
       meta: {
-        title: 'Dashboard',
+        title: 'Quản lý đơn hàng',
         noCache: false,
         permissions: [''],
       },
