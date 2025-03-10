@@ -1,0 +1,29 @@
+// Horizontal
+.flex-row {
+  display: flex;
+  display: -webkit-flex;
+  flex-direction: row;
+  -webkit-flex-direction: row;
+}
+// portrait
+.flex-column {
+  display: flex;
+  display: -webkit-flex;
+  flex-direction: column;
+  -webkit-flex-direction: column;
+}
+// arranged on both sides
+.flex-between {
+  justify-content: space-between;
+  -webkit-justify-content: space-between;
+}
+// Center horizontally
+.flex-level-center {
+  justify-content: center;
+  -webkit-justify-content: center;
+}
+// Center horizontally Center vertically
+.flex-vertical-center {
+  align-items: center;
+  -webkit-align-items: center;
+}

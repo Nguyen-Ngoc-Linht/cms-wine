@@ -1,0 +1,401 @@
+:root {
+  --el-border-color: #99a2bc;
+}
+
+.el-table {
+  --el-table-header-bg-color: #9ad9ff66;
+}
+
+// Input
+.el-input__wrapper,
+.el-select .el-input.is-focus .el-input__wrapper,
+.el-select-v2__wrapper,
+.el-textarea__inner {
+  box-shadow: none !important;
+  border-radius: 4px !important;
+  border: 1px solid var(--el-border-color);
+
+  &:hover,
+  &:focus,
+  &.is-active {
+    box-shadow: none !important;
+    border: 1px solid var(--el-input-focus-border-color);
+  }
+}
+
+.el-input__wrapper,
+.el-select .el-input.is-focus .el-input__wrapper,
+.el-select-v2__wrapper {
+  height: 32px;
+}
+
+.el-select__caret {
+  color: #059efb;
+}
+
+@mixin set-cell-color($i, $j) {
+  @for $k from $i through $j {
+    tr td:nth-child(#{$k}) {
+      color: #76809b !important;
+    }
+  }
+}
+
+@mixin generate-cell-classes($start, $end) {
+  @for $i from $start through $end {
+    @for $j from $i through $end {
+      .cell-main-#{$i}-to-#{$j} {
+        @include set-cell-color($i, $j);
+      }
+    }
+  }
+}
+
+@include generate-cell-classes(1, 10);
+// Table
+@for $i from 1 through 10 {
+  .cell-main-#{$i} {
+    .el-table__body {
+      tr td:nth-child(n + #{$i + 1}) {
+        .cell {
+          color: #76809b !important;
+        }
+      }
+    }
+  }
+}
+
+.el-table {
+  .el-table__header-wrapper {
+    border-bottom: 2px solid #ebebec;
+  }
+
+  th > .cell {
+    font-weight: 500;
+  }
+
+  th,
+  td {
+    color: $menuText;
+    font-size: 14px;
+  }
+
+  .el-table__header th.is-sortable .caret-wrapper {
+    width: 2px;
+    height: 0px;
+
+    i {
+      display: none;
+    }
+  }
+
+  .el-table__header th.is-sortable .cell:after {
+    content: '\e6d2';
+    font-family: 'elementicons';
+  }
+
+  .el-table__header th.is-sortable.ascending .cell:after {
+    content: '\e6e6';
+    font-family: 'elementicons';
+  }
+
+  .el-table__header th.is-sortable.descending .cell:after {
+    content: '\e6eb';
+    font-family: 'elementicons';
+  }
+
+  .cell {
+    word-break: normal;
+  }
+
+  &--default .cell {
+    padding: 2px 6px;
+  }
+
+  tfoot td.el-table__cell {
+    // background-color: #ebebec;
+
+    .cell {
+      color: $menuText;
+      font-weight: 600;
+      //font-size: 18px;
+      //text-align: center;
+    }
+  }
+
+  .el-table-column--selection .cell {
+    .el-checkbox__input .el-checkbox__inner {
+      height: 16px;
+      width: 16px;
+      border: 2px #059efb solid;
+    }
+
+    .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+      background-color: #059efb;
+    }
+
+    .el-checkbox__input.is-checked .el-checkbox__inner {
+      background-color: #059efb;
+    }
+  }
+}
+
+// Dialog
+.el-dialog {
+  margin-bottom: 16px;
+  padding: 0 !important;
+}
+
+.el-dialog__header {
+  padding: 12px 16px;
+}
+
+.el-dialog__body {
+  padding: 0px 16px;
+  padding-bottom: 20px;
+}
+
+.el-dialog__footer {
+  padding: 16px;
+}
+
+.el-dialog__title {
+  font-size: 20px;
+  color: $menuText;
+}
+
+// Tag
+.el-select {
+  .el-tag.is-closable {
+    max-width: 100px !important;
+
+    .el-select__tags-text {
+      max-width: 70px !important;
+    }
+  }
+}
+
+// Form
+.el-form-item__label {
+  color: #525b73;
+  font-weight: 600;
+}
+
+.w-full .el-input {
+  width: 100%;
+}
+
+// checkbox
+.el-checkbox__label {
+  color: #525b73;
+}
+
+// Confirm message box
+.el-message-box {
+  .el-message-box__headerbtn {
+    .el-icon,
+    .el-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    i,
+    &:hover i,
+    &:active i,
+    &:focus i {
+      color: #2b2f33;
+    }
+  }
+
+  .el-message-box__title span {
+    color: $menuText;
+    font-family: Roboto;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 30px;
+  }
+
+  .el-message-box__message {
+    color: $menuText;
+    font-family: Roboto;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+  }
+
+  .el-message-box__btns {
+    text-align: right;
+
+    .el-button--secondary {
+      border: 2px solid #7c7e81;
+      border-radius: 2px;
+    }
+  }
+
+  &.confirm-main {
+    .el-message-box__btns .el-button--primary {
+      background: #059efb;
+      border-color: #059efb;
+    }
+  }
+
+  &.confirm-delete {
+    .el-message-box__btns .el-button--primary {
+      background: #ff3b49;
+      border-color: #ff3b49;
+    }
+  }
+}
+
+// Collapse
+.el-collapse,
+.el-collapse-item__header,
+.el-collapse-item__wrap {
+  border: 0px;
+}
+
+.el-collapse-item__arrow {
+  margin: 0 8px;
+  flex: 0 1 auto;
+  order: -1;
+}
+
+// date picker
+.el-date-editor.el-input,
+.el-date-editor.el-input__wrapper {
+  height: 32px;
+}
+
+.el-form-item {
+  display: inline-block !important;
+  width: 100%;
+}
+
+.el-form-item.is-error {
+  .el-input__wrapper,
+  .el-input__wrapper:hover,
+  .el-input__wrapper:focus,
+  .el-input__wrapper.is-focus,
+  .el-textarea__inner,
+  .el-textarea__inner:hover,
+  .el-textarea__inner:focus,
+  .el-textarea__inner.is-focus,
+  .el-select__wrapper,
+  .el-select__wrapper:hover,
+  .el-select__wrapper:focus,
+  .el-select__wrapper.is-focus {
+    border: 1px solid var(--el-color-danger);
+    box-shadow: 0 0 0 1px transparent inset;
+  }
+
+  .el-input-group__append {
+    box-shadow: 0 1px 0 0 var(--el-color-danger) inset, 0 -1px 0 0 var(--el-color-danger) inset,
+      -1px 0 0 0 var(--el-color-danger) inset;
+  }
+}
+
+.wrap-text {
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.box-action {
+  height: 24px;
+  padding: 2px 10px;
+}
+
+.el-select__wrapper.is-disabled {
+  box-shadow: 0 0 0 1px var(--el-border-color) inset;
+
+  .el-select__prefix,
+  .el-select__suffix {
+    display: none;
+  }
+}
+
+.ql-container.ql-snow {
+  border: 1px solid #99a2bc;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.ql-toolbar.ql-snow {
+  border: 1px solid #99a2bc;
+  padding: 0 8px;
+}
+
+.ql-toolbar {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border: 1px solid #99a2bc;
+}
+
+.ql-editor {
+  height: 150px;
+  overflow-y: auto;
+  padding: 10px 12px;
+}
+
+.ql-toolbar.ql-snow .ql-formats {
+  margin-right: 5px !important;
+}
+
+.ql-snow.ql-toolbar button,
+.ql-snow .ql-toolbar button {
+  padding: 3px;
+}
+
+.ql-editor strong,
+.ql-editor strong * {
+  font-weight: 700;
+}
+
+.ql-editor ol,
+.ql-editor ul {
+  padding-left: 1em;
+}
+
+.ql-editor ol li:not(.ql-direction-rtl),
+.ql-editor ul li:not(.ql-direction-rtl) {
+  padding-left: 1em;
+}
+
+.ql-editor li::before {
+  width: 1em;
+}
+
+.el-tag {
+  &.el-tag--warning {
+    --el-tag-text-color: #fd8312;
+    --el-tag-bg-color: #ffe7d1;
+    --el-tag-border-color: #fd8312;
+    --el-tag-hover-color: #fd8312;
+  }
+
+  &.el-tag--primary {
+    --el-tag-text-color: #0c98f5;
+    --el-tag-bg-color: #e3f2fd;
+    --el-tag-border-color: #0c98f5;
+    --el-tag-hover-color: #0c98f5;
+  }
+
+  &.el-tag--success {
+    --el-tag-text-color: #34c759;
+    --el-tag-bg-color: #f5fcf6;
+    --el-tag-border-color: #34c759;
+    --el-tag-hover-color: #34c759;
+  }
+  &.el-tag--danger {
+    --el-tag-text-color: #ff3b49;
+    --el-tag-bg-color: #ffecef;
+    --el-tag-border-color: #fcaeb3;
+    --el-tag-hover-color: #ff3b49;
+  }
+  &.el-tag--info {
+    --el-tag-text-color: #76809b;
+    --el-tag-bg-color: #ebebec;
+    --el-tag-border-color: #a4a6a7;
+    --el-tag-hover-color: #76809b;
+  }
+}

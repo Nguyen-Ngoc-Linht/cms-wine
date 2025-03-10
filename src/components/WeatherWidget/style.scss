@@ -1,0 +1,149 @@
+.vww {
+  &__widget {
+    width: 100%;
+    min-width: 300px;
+    max-width: 800px;
+    &.mini {
+      height: auto;
+      padding: 0 10px;
+      // width: 350px;
+      .vww__content {
+        min-height: unset;
+        height: auto;
+      }
+    }
+  }
+  &__header {
+    position: relative;
+    padding: 10px;
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+  }
+  &__title {
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: capitalize;
+  }
+  &__content {
+    min-height: 150px;
+    // height: 180px;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    overflow: hidden;
+  }
+  &__loading {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    span {
+      display: block;
+      margin-left: 10px;
+    }
+  }
+
+  &__error {
+    width: 100%;
+    text-align: center;
+    span {
+      display: block;
+      padding: 10px;
+    }
+  }
+  &__currently {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    & > div {
+      display: flex;
+      align-items: center;
+    }
+
+    .vww__title {
+      margin-top: 10px;
+    }
+  }
+  &__temp {
+    padding: 0 10px;
+    font-size: 50px;
+    font-weight: bold;
+    line-height: 0.65em;
+    & > div {
+      display: block;
+      text-align: center;
+      padding-right: 10px;
+    }
+  }
+  &__wind {
+    font-size: 14px;
+  }
+  &__daily {
+    display: none;
+    height: 100%;
+  }
+  &__day {
+    height: 100%;
+    text-align: start;
+    position: relative;
+    min-width: 50px;
+    display: flex;
+    flex-flow: column;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+    & > span {
+      display: block;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    &-bar {
+      margin-top: 20px;
+      width: 30px;
+      height: calc(100% - 100px);
+      & div {
+        margin: 0 5px;
+        display: flex;
+        &:first-child {
+          align-items: flex-end;
+        }
+        &:last-child {
+          align-items: flex-start;
+        }
+      }
+      span {
+        display: block;
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+.mini {
+  &__summary {
+    font-weight: bold;
+    text-transform: capitalize;
+  }
+  &__widget {
+    display: inherit;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  .vww__currently {
+    // width: 300px;
+  }
+  .vww__daily {
+    display: block;
+    height: 100%;
+    // width: calc(100% - 300px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow-x: auto;
+  }
+}

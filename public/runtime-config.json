@@ -1,0 +1,15 @@
+{
+  "VITE_MODE": "dev",
+  "VITE_PORT": 2805,
+  "VITE_PUBLIC_PATH": "/",
+  "VITE_PROXY_DOMAIN_REAL": "http://103.154.62.40:8000/auth-server/api/v1.0/",
+  "VITE_APP_KEY_CLOAK_AUTH_BASE": "http://192.168.10.87:8081/auth",
+  "VITE_APP_KEY_CLOAK_BASE": "http://192.168.10.87:8081/auth/realms/sso-demo/protocol/openid-connect/logout",
+  "VITE_PROXY_DOMAIN": "http://103.154.62.40:8000/auth-server/api/v1.0/",
+  "VITE_PROXY_DOMAIN_BFF": "http://192.168.10.87:8080/vec-bff-service/v1.0/",
+  "VITE_APP_BASE_SOCKET": "http://192.168.10.87:8000",
+  "VITE_APP_UPLOAD_IMAGE_URL": "http://192.168.10.87:8080/vec-upload-gateway/v1.0/upload/file",
+  "VITE_APP_MAP_LINK": "http://192.168.10.87:6789",
+  "VITE_APP_MAP_LAYER": "Hue",
+  "VITE_APP_UPLOAD_URL": "http://192.168.10.87:8080/vec-upload-gateway/v1.0/file-vault"
+}

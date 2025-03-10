@@ -1,0 +1,74 @@
+* {
+  font-family: 'Roboto';
+  font-weight: 400;
+  font-size: 14px;
+}
+
+/*ICONFONT*/
+[class*='yu-icon-'],
+[class^='yu-icon-'] {
+  font-family: 'iconfont' !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  speak: none;
+  font-style: normal;
+  font-weight: 400;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  vertical-align: baseline;
+  display: inline-block;
+}
+
+.scroll-bar {
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  /* Phần nền của track */
+  &::-webkit-scrollbar-track-piece {
+    background: #333b48;
+  }
+  /* Nút cuộn */
+  &::-webkit-scrollbar-thumb {
+    background: #525a67;
+    transition: 1s;
+    &:hover {
+      cursor: pointer;
+      // background: #768294;
+    }
+  }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+//@charset "UTF-8";
+// Introducing reset styles
+@import './reset.scss';
+@import './fonts';
+@import './tailwind.css';
+@import './variables.module.scss';
+@import './mixin.scss';
+@import './transition.scss';
+//@import './element-ui.scss';
+@import './sidebar.scss';
+@import './button.scss';
+@import './common.scss';
+
+// toElement Ui Rewrite some styles
+@import './element.scss';
+@import './flicking-inline.scss';
+@import './flicking.scss';
