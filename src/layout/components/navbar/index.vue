@@ -185,9 +185,9 @@ const set = reactive({
 
 onMounted(() => {
   const loginOne = localStorage.getItem('loginOne')
-  if (!loginOne) {
-    handleCheckAccountChangePassword()
-  }
+  // if (!loginOne) {
+  //   handleCheckAccountChangePassword()
+  // }
 })
 
 const logout = async () => {

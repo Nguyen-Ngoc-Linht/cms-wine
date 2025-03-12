@@ -27,13 +27,13 @@ router.beforeEach(async (to, from, next) => {
 
     if (!userStore.token) {
       try {
-        await userStore.LOGIN() // Đợi login hoàn tất
+        // await userStore.LOGIN() // Đợi login hoàn tất
         userStore.SET_TOKEN(token)
-        await userStore.GET_USER_INFO()
+        // await userStore.GET_USER_INFO()
 
-        const { isAdmin } = await userStore.GET_USER_ROLE()
+        // const { isAdmin } = await userStore.GET_USER_ROLE()
         // const { permissions } = await userStore.GET_USER_ROLE_MENU()
-        const accessRoutes = await permissionStore.SET_ROUTES(isAdmin)
+        const accessRoutes = await permissionStore.SET_ROUTES(1)
 
         router.getRoutes().forEach(route => {
           if (route.name && !route.meta?.static) {
@@ -43,10 +43,10 @@ router.beforeEach(async (to, from, next) => {
 
         accessRoutes.forEach(route => router.addRoute(route))
 
-        if (isAdmin && to.name !== 'verifyLogin') {
-          cookies.set('redirect', to.fullPath)
-          return next({ name: 'verifyLogin', replace: true })
-        }
+        // if (1 && to.name !== 'verifyLogin') {
+        //   cookies.set('redirect', to.fullPath)
+        //   return next({ name: 'verifyLogin', replace: true })
+        // }
 
         const firstRoute =
           accessRoutes[0]?.children?.[0]?.children?.[0] ||

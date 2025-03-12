@@ -236,7 +236,7 @@ const $_resizeHandler = () => {
 }
 
 onBeforeMount(() => {
-  getSessionConfig()
+  // getSessionConfig()
   useEventListener('resize', $_resizeHandler)
 })
 </script>
