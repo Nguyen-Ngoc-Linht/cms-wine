@@ -5,7 +5,7 @@ import { useAppStore, usePermissionStore, useUserStore } from '@/store'
 import getPageTitle from '@/utils/getPageTitle'
 import NProgress from '@/utils/progress'
 import { getConfig } from '@/config'
-import router from './router' // Import router trực tiếp
+import router from './router'
 
 router.beforeEach(async (to, from, next) => {
   NProgress.start()
@@ -14,6 +14,7 @@ router.beforeEach(async (to, from, next) => {
   const env = getConfig()
   // && to.path === '/login'
   if (token) {
+    sessionStorage.setItem('lastRoute', to.fullPath)
     const userStore = useUserStore()
     const appStore = useAppStore()
     const permissionStore = usePermissionStore()
@@ -47,6 +48,13 @@ router.beforeEach(async (to, from, next) => {
         //   cookies.set('redirect', to.fullPath)
         //   return next({ name: 'verifyLogin', replace: true })
         // }
+
+        const lastRoute = sessionStorage.getItem('lastRoute')
+
+        if (lastRoute) {
+          sessionStorage.removeItem('lastRoute')
+          return next(lastRoute)
+        }
 
         const firstRoute =
           accessRoutes[0]?.children?.[0]?.children?.[0] ||

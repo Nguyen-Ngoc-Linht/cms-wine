@@ -18,8 +18,8 @@
         :class="{ active: !set.isCollapse }"
         class="logo-sidebar"
       >
-        <span v-if="!set.isCollapse">2023 &copy; Design by</span
-        ><img src="@/assets/imgs/logo_elcom.png" />
+        <span v-if="!set.isCollapse">2025 &copy; Design by Joy Plus</span>
+<!--        <img src="@/assets/imgs/logo_elcom.png" />-->
       </div>
     </el-scrollbar>
   </div>

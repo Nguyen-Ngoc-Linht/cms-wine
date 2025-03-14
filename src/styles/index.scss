@@ -55,6 +55,18 @@ input[type='number'] {
   -moz-appearance: textfield;
 }
 
+.el-form-item--default {
+  --font-size: 14px;
+  --el-form-label-font-size: var(--font-size);
+  margin-bottom: 13px;
+}
+
+.el-form-item {
+  display: flex;
+  --font-size: 14px;
+  margin-bottom: 13px;
+}
+
 //@charset "UTF-8";
 // Introducing reset styles
 @import './reset.scss';

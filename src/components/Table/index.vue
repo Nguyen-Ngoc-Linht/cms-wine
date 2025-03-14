@@ -8,6 +8,7 @@
     class="cell-main-3"
     :row-class-name="tableRowClassName"
     @selection-change="handleSelectionChange"
+    :max-height="maxHeight"
     @row-click="handeShowView"
   >
     <el-table-column
@@ -33,6 +34,7 @@
       :prop="field.prop"
       :width="field.width"
       :sortable="field.sort"
+      :align="field.align"
     >
       <template
         v-if="$slots[field.prop]"
@@ -54,7 +56,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import {computed, ref} from 'vue'
 defineOptions({
   name: 'TableViolation',
 })
@@ -89,6 +91,11 @@ const handeShowView = data => {
 const tableRowClassName = ({ row }) => {
   return selectedRows.value.includes(row) ? 'row-selected' : ''
 }
+
+const maxHeight = computed(() => {
+  const viewportHeight = window.innerHeight
+  return viewportHeight - 270
+})
 </script>
 
 <style lang="scss">

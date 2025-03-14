@@ -189,24 +189,24 @@ const getList = () => {
   listLoading.value = true
   const userId = userStore.uuid
 
-  notifyStore
-    .apiGetNotifyByUser(params.value, userId)
-    .then(res => {
-      if (res.status === 200) {
-        list.value = res.data.content
-        totalItem.value = res.data.totalElements
-        getCountNotify()
-        if (!isShowNotify.value) {
-          timeoutId = setTimeout(getList, 60000)
-        }
-      }
-    })
-    .catch(err => {
-      console.log(err)
-    })
-    .finally(() => {
-      listLoading.value = false
-    })
+  // notifyStore
+  //   .apiGetNotifyByUser(params.value, userId)
+  //   .then(res => {
+  //     if (res.status === 200) {
+  //       list.value = res.data.content
+  //       totalItem.value = res.data.totalElements
+  //       getCountNotify()
+  //       if (!isShowNotify.value) {
+  //         timeoutId = setTimeout(getList, 60000)
+  //       }
+  //     }
+  //   })
+  //   .catch(err => {
+  //     console.log(err)
+  //   })
+  //   .finally(() => {
+  //     listLoading.value = false
+  //   })
 }
 const updateList = () => {
   listLoading.value = true

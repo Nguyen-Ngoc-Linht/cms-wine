@@ -1,7 +1,38 @@
 <template>
   <div class="padding-20">
-    <h2 class="text-2xl font-bold">Biểu đồ tổng quan</h2>
-    <el-row :gutter="20" class="mt-3">
+    <div class="flex justify-between">
+      <h2 class="text-2xl font-bold">Biểu đồ tổng quan</h2>
+      <div class="flex items-center gap-3">
+        <svg-icon
+          icon-class="filter-fill"
+          class="width-24 height-24 text-[#0dcaf0]"
+        />
+        <el-select
+          v-model="filter.type"
+          filterable
+          collapse-tags
+          collapse-tags-tooltip
+          class="w-full md:max-w-[30%] lg:max-w-[120px] short"
+        >
+          <el-option label="Ngày" :value="1"></el-option>
+          <el-option label="Tháng" :value="2"></el-option>
+          <el-option label="Năm" :value="3"></el-option>
+        </el-select>
+        <el-date-picker
+          v-model="filter.timeSearch"
+          type="daterange"
+          @change="getDataDefault"
+          start-placeholder="Ngày bắt đầu"
+          range-separator="đến"
+          end-placeholder="Ngày kết thúc"
+          clearable
+          value-format="YYYY-MM-DD"
+          format="DD/MM/YYYY"
+          class="w-full md:max-w-[30%] lg:max-w-[360px] flex-grow-0"
+        />
+      </div>
+    </div>
+    <el-row :gutter="20" class="mt-4">
       <el-col :span="6">
         <el-card>
           <div class="flex justify-between">
@@ -63,10 +94,20 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeMount, onMounted, reactive, ref, watch } from 'vue'
-import {apiGetOrderStatistic} from '@/api/dashboard'
+import { onMounted, reactive, ref, watch } from 'vue'
+import {apiGetOrderStatistic, apiGetRevenueStatistic} from '@/api/dashboard'
 import Bar from '@/views/dashboard/components/Bar.vue'
+import {cloneDeep} from 'lodash-unified'
+import moment from 'moment'
 
+const defaultFilter = {
+  type: 1,
+  timeSearch: [
+    moment().subtract(14, 'days').startOf('day').format('YYYY-MM-DD'),
+    moment().endOf('day').format('YYYY-MM-DD'),
+  ],
+}
+const filter = reactive(cloneDeep(defaultFilter))
 const orderStatistics = ref({
   totalOrder: 11,
   totalUserPurchases: 10,
@@ -78,93 +119,17 @@ const dataBar = ref([
     date: '2025-03-01',
     revenue: 201
   },
-  {
-    date: '2025-03-02',
-    revenue: 50
-  },
-  {
-    date: '2025-03-03',
-    revenue: 75.25
-  },
-  {
-    date: '2025-03-04',
-    revenue: 125.75
-  },
-  {
-    date: '2025-03-05',
-    revenue: 99.99
-  },
-  {
-    date: '2025-03-06',
-    revenue: 150
-  },
-  {
-    date: '2025-03-07',
-    revenue: 200.3
-  },
-  {
-    date: '2025-03-08',
-    revenue: 75
-  },
-  {
-    date: '2025-03-09',
-    revenue: 135.25
-  },
-  {
-    date: '2025-03-10',
-    revenue: 110.4
-  },
-  {
-    date: '2025-03-11',
-    revenue: 210.75
-  },
-  {
-    date: '2025-03-12',
-    revenue: 80.5
-  },
-  {
-    date: '2025-03-13',
-    revenue: 140.1
-  },
-  {
-    date: '2025-03-14',
-    revenue: 65.25
-  },
-  {
-    date: '2025-03-15',
-    revenue: 120
-  },
-  {
-    date: '2025-03-16',
-    revenue: 55.75
-  },
-  {
-    date: '2025-03-17',
-    revenue: 175.5
-  },
-  {
-    date: '2025-03-18',
-    revenue: 99.99
-  },
-  {
-    date: '2025-03-19',
-    revenue: 85.75
-  },
-  {
-    date: '2025-03-20',
-    revenue: 190.2
-  },
 ])
 
 onMounted(() => {
-  // getDataDefault()
+  getDataDefault()
 })
 const getDataDefault = async () => {
   try {
     const params = {
       dateFilter: {
-        fromDate: '2025-03-01',
-        toDate: '2025-03-29'
+        fromDate: filter.timeSearch && filter.timeSearch.length > 0 ? filter.timeSearch[0] : null,
+        toDate: filter.timeSearch && filter.timeSearch.length > 0 ? filter.timeSearch[1] : null
       },
       // "monthYearFilter": {
       //     "month": 3,
@@ -173,7 +138,13 @@ const getDataDefault = async () => {
       type: 1
     }
     const rs = await apiGetOrderStatistic(params)
-    console.log(rs, 'data')
+    if (rs.code === 200) {
+      orderStatistics.value = rs.data
+    }
+    const rsData = await apiGetRevenueStatistic(params)
+    if (rsData.code === 200) {
+      dataBar.value = rsData.data.dailyRevenues
+    }
   } catch (e) {
     console.log(e)
   }

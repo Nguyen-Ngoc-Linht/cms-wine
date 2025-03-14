@@ -67,16 +67,16 @@ export function apiDeleteUser(id) {
 }
 
 export function getUserList(data) {
-  return httpBff.request({
-    url: '/system/user',
-    method: 'get',
+  return http.request({
+    url: '/user-service/api/v1.0/users/find-all',
+    method: 'post',
     data,
   })
 }
 
 export function getUserDetail(id) {
-  return httpBff.request({
-    url: '/system/user/' + id,
+  return http.request({
+    url: '/user-service/api/v1.0/users/' + id,
     method: 'get',
   })
 }

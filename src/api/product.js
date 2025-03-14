@@ -1,5 +1,20 @@
 import http from '@/utils/request'
 
+export function apiGetProduct(data) {
+  return http.request({
+    method: 'post',
+    url: '/wine-service/api/v1.0/managements/products/find-all',
+    data,
+  })
+}
+
+export function apiDeleteProduct(product_id) {
+  return http.request({
+    method: 'delete',
+    url: `/wine-service/api/v1.0/managements/products/${product_id}`,
+  })
+}
+
 export function apiGetCategory(data) {
   return http.request({
     method: 'post',

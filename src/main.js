@@ -60,23 +60,4 @@ const initApp = async () => {
 }
 initApp()
 
-// fetch(getConfig('VITE_PROXY_DOMAIN_REAL') + 'user/realm-config', {
-//   method: 'GET',
-//   headers: {
-//     'Content-Type': 'application/json',
-//     accept: 'application/json',
-//   },
-// })
-//   .then(async res => {
-//     const response = await res.json()
-//     if (response.status !== 403) {
-//       // Thêm token vào Vue app
-//     } else {
-//       document.location.href = '/404.html'
-//     }
-//   })
-//   .catch(e => {
-//     console.log(e)
-//   })
-
 export { app }
