@@ -6,6 +6,7 @@ import product from './modules/product'
 import user from './modules/user'
 import dashboard from './modules/dashboard'
 import order from './modules/order'
+import setting from './modules/setting'
 
 export const constantRoutes = [
   {
@@ -88,6 +89,7 @@ export const asyncRoutes = [
   product,
   order,
   user,
+  setting,
   {
     path: '/:pathMatch(.*)*',
     redirect: '/404',

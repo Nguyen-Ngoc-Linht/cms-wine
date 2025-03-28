@@ -1443,4 +1443,13 @@ export default {
     verify: 'Xác thực',
     refreshCode: 'Lấy lại mã xác thực',
   },
+  order: {
+    id: 'ID',
+    userId: 'Người đặt hàng',
+    totalAmount: 'Tổng tiền',
+    note: 'Ghi chú',
+    status: 'Trạng thái',
+    paymentMethod: 'Phương thức thanh toán',
+    createTime: 'Ngày đặt'
+  },
 }

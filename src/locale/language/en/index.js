@@ -1434,4 +1434,13 @@ export default {
     verify: 'Verify',
     refreshCode: 'Retrieve verify code',
   },
+  order: {
+    id: 'ID',
+    userId: 'Orderer',
+    totalAmount: 'Total amount',
+    note: 'Note',
+    status: 'Status',
+    paymentMethod: 'Payment method',
+    createTime: 'Order date'
+  },
 }
