@@ -28,7 +28,7 @@
     <div class="flex items-center justify-between paddingX-24 mt-3">
       <div class="flex gap-px-8 items-center">
         <el-button
-          @click.stop="handleAddProduct"
+          @click="showBankDialog = true"
           text
           size="default"
           class="!p-0"
@@ -41,7 +41,7 @@
               icon-class="el-icon-plus"
               class="width-20 height-20 margin-right-4"
             />
-            Thêm sản phẩm
+            Thêm tài khoản
           </div>
         </el-button>
       </div>
@@ -53,11 +53,13 @@
         <TableViolation
           :listLoading="listLoading"
           :fields="fields"
-          :STT="true"
           :data="list"
           :page="filter.page"
           :size="filter.size"
         >
+          <template #STT="{ row }">
+            <span>{{ row.stt }}</span>
+          </template>
           <template #category="{ row }">
             <span>{{ row.category.name }}</span>
           </template>
@@ -66,7 +68,7 @@
           </template>
           <template #action="{ row }">
             <span
-              @click.stop="openEditCategory(row)"
+              @click.stop="openEditBankAccount(row)"
               class="delete-member pointer ms-2 me-3"
             >
               <svg-icon
@@ -86,12 +88,13 @@
             </span>
           </template>
           <template #defaultAction="{ row }">
-            <span
-              ><el-radio
+            <el-radio
                 v-model="defaultMethod"
-                :value="row.id"
-              ></el-radio
-            ></span>
+                :label="row.id"
+                @change="handleDefaultMethodChange(row.id)"
+            >
+              &nbsp;
+            </el-radio>
           </template>
         </TableViolation>
       </div>
@@ -106,52 +109,114 @@
       <template v-slot:content>
         <form-category
           :type-dialog="typeDialog"
-          :category-info="infoCategory"
+          :category-info="infoBankAccount"
           @closeUpdate="handleCloseDialog"
         ></form-category>
       </template>
     </Dialog>
     <el-dialog
-      v-model="deleteCategoryDialog"
-      title="Xóa sản phẩm"
+      v-model="deleteBankAccountDialog"
+      title="Xóa tài khoản"
       width="500"
       align-center
     >
-      <span>Bạn có chắc chắn muốn xóa sản phẩm đã chọn</span>
+      <span>Bạn có chắc chắn muốn xóa tài khoản đã chọn</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button
             class="bg-outline-secondary"
-            @click="deleteCategoryDialog = false"
+            @click="deleteBankAccountDialog = false"
           >
             {{ $t('configUser.cancel') }}
           </el-button>
           <el-button
             class="el-button--main"
-            @click="handleDeleteProduct()"
+            @click="handleDeleteBankAccount()"
           >
             {{ $t('el.datepicker.confirm') }}
           </el-button>
         </div>
       </template>
     </el-dialog>
+    <el-dialog
+      v-model="showBankDialog"
+      :title="dialogTitle"
+      width="500px"
+      @close="resetBankAccount"
+    >
+      <el-form
+        ref="formRef"
+        :model="bankAccount"
+        :rules="rules"
+        label-width="120px"
+        label-position="top"
+      >
+        <el-form-item
+          label="Tên ngân hàng"
+          prop="bankName"
+        >
+          <el-input v-model="bankAccount.bankName" />
+        </el-form-item>
+
+        <el-form-item
+          label="Số tài khoản"
+          prop="accountNumber"
+        >
+          <el-input v-model="bankAccount.accountNumber" />
+        </el-form-item>
+
+        <el-form-item
+          label="Tên chủ sở hữu"
+          prop="accountName"
+        >
+          <el-input v-model="bankAccount.accountName" />
+        </el-form-item>
+
+        <el-form-item
+          label="Chi nhánh"
+          prop="branch"
+        >
+          <el-input v-model="bankAccount.branch" />
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <el-button @click="showBankDialog = false">Hủy</el-button>
+        <el-button
+          type="primary"
+          @click="handleSaveBankAccount"
+          >Lưu
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, computed } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash-unified'
 import { useI18n } from '@/locale'
 import TableViolation from '@/components/Table/index.vue'
 import { apiDeleteProduct } from '@/api/product'
-import { apiGetAllBankAccount } from '@/api/bank-account'
+import {
+  apiCreateBankAccount, apiDeleteBankAccount,
+  apiGetAllBankAccount,
+  apiSetDefaultBankAccount,
+  apiUpdateBankAccount,
+} from '@/api/bank-account'
 import Dialog from '@/components/Dialog/index.vue'
-import { ElMessage } from 'element-plus'
+import { dayjs, ElMessage, ElMessageBox } from 'element-plus'
 import FormCategory from '@/views/category/FormCategory.vue'
 
 const { t } = useI18n()
 
 const fields = ref([
+  {
+    key: 'STT',
+    label: 'STT',
+    width: 80,
+    prop: 'STT',
+  },
   {
     key: 'bankName',
     label: 'Tên ngân hàng',
@@ -200,17 +265,51 @@ const fields = ref([
 
 const listLoading = ref(true)
 const list = ref([])
-const deleteCategoryDialog = ref(false)
+const deleteBankAccountDialog = ref(false)
+const showBankDialog = ref(false)
+const dialogTitle = ref('Thêm tài khoản ngân hàng')
+const isEditing = ref(false)
 const defaultFilter = {
-  page: 1,
-  size: 10,
-  total: 0,
+  keyword: null,
+  timeSearch: null,
 }
+const bankAccount = reactive({
+  bankName: '',
+  accountNumber: '',
+  accountName: '',
+  branch: '',
+})
+const openEditBankAccount = row => {
+  isEditing.value = true
+  dialogTitle.value = 'Chỉnh sửa tài khoản ngân hàng'
+  bankAccount.id = row.id
+  bankAccount.bankName = row.bankName
+  bankAccount.accountNumber = row.accountNumber
+  bankAccount.accountName = row.accountName
+  bankAccount.branch = row.branch
+  showBankDialog.value = true
+}
+const resetBankAccount = () => {
+  bankAccount.bankName = ''
+  bankAccount.accountNumber = ''
+  bankAccount.accountName = ''
+  bankAccount.branch = ''
+  isEditing.value = false
+  dialogTitle.value = 'Thêm tài khoản ngân hàng'
+}
+const formRef = ref(null)
+
+const rules = reactive({
+  bankName: [{ required: true, message: 'Tên ngân hàng không được để trống', trigger: 'blur' }],
+  accountNumber: [{ required: true, message: 'Số tài khoản không được để trống', trigger: 'blur' }],
+  accountName: [{ required: true, message: 'Tên chủ sở hữu không được để trống', trigger: 'blur' }],
+  branch: [{ required: false }],
+})
 const filter = reactive(cloneDeep(defaultFilter))
 const showDialog = ref(false)
 const titleDialog = ref('')
 const typeDialog = ref('add')
-const infoCategory = ref({})
+const infoBankAccount = ref({})
 
 const defaultMethod = computed({
   get: () => list.value.find(i => i.isDefault === true).id,
@@ -220,51 +319,93 @@ const defaultMethod = computed({
   },
 })
 
+const handleDefaultMethodChange = async id => {
+  try {
+    await ElMessageBox.confirm(
+      'Bạn có chắc chắn muốn đặt tài khoản này làm mặc định?',
+      'Xác nhận',
+      {
+        confirmButtonText: 'Có',
+        cancelButtonText: 'Hủy',
+        type: 'warning',
+      }
+    )
+
+    const rs = await apiSetDefaultBankAccount(id)
+    if (rs.code === 200) {
+      console.log('set defaultMethod', rs)
+      ElMessage.success('Cài mặc định thành công')
+    } else {
+      ElMessage.error('Cài mặc định thất bại')
+    }
+  } catch (error) {
+    console.log('Người dùng đã hủy xác nhận.')
+  }
+  await getList()
+}
+
 onMounted(() => {
   getList()
 })
 
 const getList = async () => {
   listLoading.value = true
-  // const params = {
-  //   paged: {
-  //     page: filter.page,
-  //     size: filter.size
-  //   }
-  // }
-  const rs = await apiGetAllBankAccount()
+  const fromDate = filter.timeSearch?.[0] || null
+  const toDate = filter.timeSearch?.[1] || null
+
+  const params = {
+    name: filter.keyword || null,
+    fromDate: fromDate ? dayjs(fromDate).format('YYYY-MM-DD') : null,
+    toDate: toDate ? dayjs(toDate).format('YYYY-MM-DD') : null,
+  }
+  const rs = await apiGetAllBankAccount(params)
   if (rs.code === 200) {
-    list.value = rs.data
+    list.value = rs.data.map((item, index) => ({
+      ...item,
+      stt: index + 1,
+    }))
     filter.total = rs.data.totalElements
   }
   listLoading.value = false
 }
+const handleSaveBankAccount = async () => {
+  if (!formRef.value) return console.error('⚠ formRef.value is null')
 
-const openAddProduct = () => {
-  titleDialog.value = 'Thêm danh mục'
-  typeDialog.value = 'add'
-  infoCategory.value = {}
-  showDialog.value = true
-}
-const openEditProduct = data => {
-  titleDialog.value = 'Sửa danh mục'
-  typeDialog.value = 'edit'
-  infoCategory.value = data
-  showDialog.value = true
-}
-const openDialogDelete = data => {
-  infoCategory.value = data
-  deleteCategoryDialog.value = true
-}
-const handleDeleteProduct = async () => {
   try {
-    const rs = await apiDeleteProduct(infoCategory.value.id)
-    if (rs.code === 200) {
-      ElMessage.success('Xóa sản phầm thành công')
+    const isValid = await formRef.value.validate().catch(() => false)
+    if (!isValid) return ElMessage.warning('Vui lòng kiểm tra lại thông tin!')
+
+    let response
+    if (isEditing.value) {
+      response = await apiUpdateBankAccount(bankAccount.id, bankAccount)
     } else {
-      ElMessage.error('Xóa sản phẩm thất bại')
+      response = await apiCreateBankAccount(bankAccount)
     }
-    deleteCategoryDialog.value = false
+    if (response.code === 200 || response.code === 201) {
+      ElMessage.success(isEditing.value ? 'Cập nhật thành công!' : 'Thêm thành công!')
+      showBankDialog.value = false
+      await getList()
+    } else {
+      ElMessage.error('Có lỗi xảy ra!')
+    }
+  } catch (error) {
+    ElMessage.error(error.response?.data?.message || 'Lỗi kết nối đến server!')
+  }
+}
+
+const openDialogDelete = data => {
+  infoBankAccount.value = data
+  deleteBankAccountDialog.value = true
+}
+const handleDeleteBankAccount = async () => {
+  try {
+    const rs = await apiDeleteBankAccount(infoBankAccount.value.id)
+    if (rs.code === 200) {
+      ElMessage.success('Xóa tài khoản thành công')
+    } else {
+      ElMessage.error('Xóa tài khoản thất bại')
+    }
+    deleteBankAccountDialog.value = false
     await getList()
   } catch (e) {
     console.log(e)
@@ -273,14 +414,6 @@ const handleDeleteProduct = async () => {
 
 const handleCloseDialog = () => {
   showDialog.value = false
-  getList()
-}
-const handleSizeChange = size => {
-  filter.size = size
-  getList()
-}
-const handlePageChange = page => {
-  filter.page = page
   getList()
 }
 </script>

@@ -22,9 +22,9 @@ export default {
       },
     },
     {
-      path: 'category',
-      name: 'product-category',
-      component: () => import('@/views/category/index.vue'),
+      path: 'transaction-log',
+      name: 'transaction-log',
+      component: () => import('@/views/transaction-log/manage.vue'),
       meta: {
         title: 'Quản lý lịch sử giao dịch',
         noCache: true,
@@ -33,7 +33,7 @@ export default {
     },
     {
       path: 'attributes',
-      name: 'product-attributes',
+      name: 'product-attributes1',
       component: () => import('@/views/attributes/index.vue'),
       meta: {
         title: 'Quản lý giao diện',
@@ -43,7 +43,7 @@ export default {
     },
     {
       path: 'attributes',
-      name: 'product-attributes',
+      name: 'product-attributes2',
       component: () => import('@/views/attributes/index.vue'),
       meta: {
         title: 'Lịch sử hoạt động',

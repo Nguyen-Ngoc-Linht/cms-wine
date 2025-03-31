@@ -8,71 +8,32 @@ export function apiGetAllBankAccount(data) {
   })
 }
 
-export function apiDeleteProduct(product_id) {
-  return http.request({
-    method: 'delete',
-    url: `/wine-service/api/v1.0/managements/products/${product_id}`,
-  })
-}
-
-export function apiGetCategory(data) {
-  return http.request({
-    method: 'post',
-    url: '/wine-service/api/v1.0/managements/categories/find-all',
-    data,
-  })
-}
-
-export function apiCreateCategory(data) {
-  return http.request({
-    method: 'post',
-    url: '/wine-service/api/v1.0/managements/categories',
-    data,
-  })
-}
-
-export function apiUpdateCategory(category_id, data) {
+export function apiSetDefaultBankAccount(account_id) {
   return http.request({
     method: 'put',
-    url: `/wine-service/api/v1.0/managements/categories/${category_id}`,
-    data,
+    url: `/bank-payment/api/v1.0/bank-accounts/${account_id}/set-default`,
   })
 }
 
-export function apiDeleteCategory(category_id) {
-  return http.request({
-    method: 'delete',
-    url: `/wine-service/api/v1.0/managements/categories/${category_id}`,
-  })
-}
-
-export function apiGetAttribute(data) {
+export function apiCreateBankAccount(data) {
   return http.request({
     method: 'post',
-    url: '/wine-service/api/v1.0/managements/attributes/find-all',
+    url: '/bank-payment/api/v1.0/bank-accounts',
     data,
   })
 }
 
-export function apiCreateAttribute(data) {
-  return http.request({
-    method: 'post',
-    url: '/wine-service/api/v1.0/managements/attributes',
-    data,
-  })
-}
-
-export function apiUpdateAttribute(attributes_id, data) {
+export function apiUpdateBankAccount(account_id, data) {
   return http.request({
     method: 'put',
-    url: `/wine-service/api/v1.0/managements/attributes/${attributes_id}`,
+    url: `/bank-payment/api/v1.0/bank-accounts/${account_id}`,
     data,
   })
 }
 
-export function apiDeleteAttribute(attributes_id) {
+export function apiDeleteBankAccount(account_id) {
   return http.request({
     method: 'delete',
-    url: `/wine-service/api/v1.0/managements/attributes/${attributes_id}`,
+    url: `/bank-payment/api/v1.0/bank-accounts/${account_id}`,
   })
 }
