@@ -1,6 +1,7 @@
 <template>
   <div class="chart-cont">
     <div ref="chartRef" class="chart" v-if="data.length"></div>
+    <div></div>
   </div>
 </template>
 
