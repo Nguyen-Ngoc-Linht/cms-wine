@@ -7,6 +7,7 @@ import user from './modules/user'
 import dashboard from './modules/dashboard'
 import order from './modules/order'
 import setting from './modules/setting'
+import report from './modules/report'
 
 export const constantRoutes = [
   {
@@ -89,6 +90,7 @@ export const asyncRoutes = [
   product,
   order,
   user,
+  report,
   setting,
   {
     path: '/:pathMatch(.*)*',
