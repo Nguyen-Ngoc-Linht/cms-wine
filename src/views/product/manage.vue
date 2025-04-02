@@ -146,8 +146,9 @@ import {apiDeleteCategory, apiDeleteProduct, apiGetProduct} from '@/api/product'
 import Dialog from '@/components/Dialog/index.vue'
 import { ElMessage } from 'element-plus'
 import FormCategory from '@/views/category/FormCategory.vue'
+import {useRouter} from 'vue-router'
 const { t } = useI18n()
-
+const router = useRouter()
 const fields = ref([
   {
     key: 'name',
@@ -222,6 +223,9 @@ const getList = async () => {
   listLoading.value = false
 }
 
+const handleAddProduct = () => {
+  router.push('/product/manage/add')
+}
 const openAddProduct = () => {
   titleDialog.value = 'Thêm danh mục'
   typeDialog.value = 'add'
