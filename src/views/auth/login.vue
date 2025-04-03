@@ -24,11 +24,11 @@
 import { onMounted, reactive, ref } from 'vue'
 import {apiLogin} from '@/api/auth'
 import {ElMessage} from 'element-plus'
-import cookies from '@/utils/cookies'
 import {useUserStore} from '@/store'
+import {useRouter} from 'vue-router'
 
 const userStore = useUserStore()
-
+const router = useRouter()
 const infoLogin = ref({
   username: '',
   password: '',
@@ -43,7 +43,9 @@ const handleLogin = async () => {
   console.log(rs)
   if (rs.code === 200) {
     userStore.SET_TOKEN(rs.data.token)
+    localStorage.setItem('userInfo', JSON.stringify(rs.data))
     ElMessage.success('Đăng nhập thành công')
+    await router.push('/')
   }
   console.log(rs, 'data')
 }

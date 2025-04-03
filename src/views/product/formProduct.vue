@@ -93,7 +93,11 @@
             </el-col>
             <el-col :md="12" :sm="12" :span="24">
               <el-form-item label="Số nhóm biến thể">
-                <el-input v-model="nbVariant" type="number"></el-input>
+                <el-input
+                  v-model="nbVariant"
+                  type="number"
+                  :placeholder="$t('configUser.pleaseEnter')"
+                ></el-input>
               </el-form-item>
             </el-col>
             <el-col :md="12" :sm="12" :span="24">
@@ -103,6 +107,7 @@
                   clearable
                   collapse-tags
                   style="width: 100%"
+                  :placeholder="$t('configUser.pleaseSelect')"
                 >
                   <el-option
                     v-for="(item, index) in categories"
@@ -114,6 +119,46 @@
               </el-form-item>
             </el-col>
             <el-col :span="24" class="mt-2"></el-col>
+            <el-col v-for="(variant, index) in infoProduct.productVariants" :key="index" :span="24" class="mt-2">
+              <el-card>
+                <el-row :gutter="12">
+                  <el-col :span="8">
+                    <h6 class="text-sm w-100">Giá</h6>
+                    <el-input v-model="variant.price" type="number"></el-input>
+                  </el-col>
+                  <el-col :span="8">
+                    <h6 class="text-sm w-100">Số lượng</h6>
+                    <el-input v-model="variant.quantity" type="number"></el-input>
+                  </el-col>
+                  <el-col :span="8">
+                    <h6 class="text-sm w-100">Thuộc tính</h6>
+                    <el-select
+                      v-model="variant.attributes"
+                      multiple
+                      clearable
+                      collapse-tags
+                      style="width: 100%"
+                      @change="(value) => {setAttributeVariant(value, index)}"
+                    >
+                      <el-option
+                        v-for="(item, indexList) in attributes"
+                        :key="indexList"
+                        :label="item.name"
+                        :value="item.id"
+                      ></el-option>
+                    </el-select>
+                  </el-col>
+                  <el-col v-for="(attributeId, indexAttribute) in variant.variantAttributes" :key="indexAttribute" :span="8">
+                    <el-form-item :label="getAttributeName(attributeId)">
+                      <el-input
+                        v-model="attributeId.value"
+                        placeholder="Nhập giá trị">
+                      </el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </el-card>
+            </el-col>
             <el-col :span="24" class="mt-2"></el-col>
             <el-col :span="24">
               <el-form-item
@@ -141,11 +186,7 @@
                 :on-success="null"
                 :on-preview="null"
                 :on-remove="handleRemove"
-                :on-change="
-                (file, fileList) => {
-                  handleChangeFile(file, fileList, 2)
-                }
-              "
+                :on-change="(file, fileList) => {handleChangeFile(file, fileList)}"
                 :before-remove="beforeRemove"
                 :on-exceed="null"
                 :auto-upload="false"
@@ -179,10 +220,10 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from 'vue'
+import {onMounted, ref, watch} from 'vue'
 import { useI18n } from '@/locale'
 import {useRoute, useRouter} from 'vue-router'
-import {apiGetAttribute, apiGetCategory} from '@/api/product'
+import {apiGetAttribute, apiGetCategory, uploadFile} from '@/api/product'
 import {ElMessage, ElMessageBox} from 'element-plus'
 
 const props = defineProps({
@@ -198,6 +239,7 @@ const props = defineProps({
 const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
+const user = ref({})
 
 const ruleEdit = ref({
   name: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
@@ -206,7 +248,7 @@ const ruleEdit = ref({
     id: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
   }
 })
-const nbVariant = ref(null)
+const nbVariant = ref(0)
 const infoProduct = ref({
   name: '',
   attributes: [],
@@ -215,6 +257,7 @@ const infoProduct = ref({
     id: ''
   },
   listImage: [],
+  productVariants: [],
 })
 const formProduct = ref(null)
 
@@ -225,6 +268,7 @@ const categories = ref([])
 const processing = ref(false)
 
 onMounted(() => {
+  user.value = JSON.parse(localStorage.getItem('userInfo'))
   setDataDefault()
 })
 
@@ -260,9 +304,10 @@ const setDataDefault = async () => {
 
 const handleAddProduct = async () => {
   try {
-    await Promise.all([
-      validFormData()
-    ])
+    // await Promise.all([
+    //   validFormData()
+    // ])
+    console.log(infoProduct.value, 'info')
     processing.value = true
     processing.value = false
   } catch (e) {
@@ -294,7 +339,35 @@ const validFormData = async () => {
     })
   })
 }
+// Thuộc tính và biến thể
+watch(nbVariant, (newVal) => {
+  if (!newVal || isNaN(newVal) || newVal < 0) {
+    nbVariant.value = 0
+    return
+  }
+  if (!Array.isArray(infoProduct.value.productVariants)) {
+    infoProduct.value.productVariants = []
+  }
+  const currentVariants = infoProduct.value.productVariants.length
 
+  if (newVal > currentVariants) {
+    for (let i = currentVariants; i < newVal; i++) {
+      // eslint-disable-next-line no-undef
+      const existingVariant = savedVariants.value?.[i] || {
+        name: `Variant ${i + 1}`,
+        price: 0,
+        quantity: 0,
+        variantAttributes: [],
+        variantAttributesValue: {}
+      }
+      infoProduct.value.productVariants.push(existingVariant)
+    }
+  } else if (newVal < currentVariants) {
+    // eslint-disable-next-line no-undef
+    savedVariants.value = infoProduct.value.productVariants.slice()
+    infoProduct.value.productVariants.splice(newVal)
+  }
+})
 const setAttribute = (selectedAttributes) => {
   if (!attributeCache.value) {
     attributeCache.value = []
@@ -316,27 +389,46 @@ const setAttribute = (selectedAttributes) => {
     return null
   }).filter((item) => item !== null)
 }
-const handleChangeFile = async (file, fileList, type) => {
-  const isAllowedSize = file.size / 1024 / 1024 < 10
-  if (!isAllowedSize) {
-    const index = fileList.indexOf(file)
-    if (index > -1) {
-      fileList.splice(index, 1)
-    }
-    ElMessage.error(t('configUser.message.overflowMaxSize', ['10']))
-    return false
+
+const setAttributeVariant = (selectedAttributes, index) => {
+  if (!attributeCache[index]) {
+    attributeCache[index] = {}
   }
-  if (type === 1) {
-    const allowedTypes = ['application/pdf']
-    if (!allowedTypes.includes(file.raw.type)) {
+
+  const currentAttributes = infoProduct.value.productVariants[index]?.variantAttributes || []
+  currentAttributes.forEach((attribute) => {
+    if (attribute?.attributeId) {
+      attributeCache[index][attribute.attributeId] = attribute.value || ''
+    }
+  })
+
+  infoProduct.value.productVariants[index].variantAttributes = selectedAttributes.map((attributeId) => {
+    const existingValue = attributeCache[index][attributeId] || ''
+    const attributeName = attributes.value.find((item) => item.id === attributeId)?.name || ''
+
+    return {
+      attributeId,
+      value: existingValue,
+      name: attributeName,
+    }
+  })
+}
+const getAttributeName = (attributeId) => {
+  const attribute = attributes.value.find(attr => attr.id === attributeId?.attributeId)
+  return attribute ? attribute.name : 'Thuộc tính'
+}
+// File
+const handleChangeFile = async (file, fileList) => {
+  try {
+    const isAllowedSize = file.size / 1024 / 1024 < 10
+    if (!isAllowedSize) {
       const index = fileList.indexOf(file)
       if (index > -1) {
         fileList.splice(index, 1)
       }
-      ElMessage.error('File không đúng định dạng pdf')
+      ElMessage.error(t('configUser.message.overflowMaxSize', ['10']))
       return false
     }
-  } else if (type === 2) {
     const allowedTypes = ['image/jpeg', 'image/png']
     if (!allowedTypes.includes(file.raw.type)) {
       const index = fileList.indexOf(file)
@@ -346,30 +438,41 @@ const handleChangeFile = async (file, fileList, type) => {
       ElMessage.error('File không đúng định dạng .jpg/.png')
       return false
     }
-  }
-  const fileToUpload = file.raw || file
-  if (!fileToUpload || !(fileToUpload instanceof File)) {
-    console.error('Invalid file provided:', file)
-    return
-  }
-  const formData = new FormData()
-  formData.append('file', fileToUpload)
-  formData.append('keepFileName', true)
-  formData.append('mainEntityName', 'requestProcessing')
-  formData.append('fileCategory', type)
+    const fileToUpload = file.raw || file
+    if (!fileToUpload || !(fileToUpload instanceof File)) {
+      console.error('Invalid file provided:', file)
+      return
+    }
+    const formData = new FormData()
+    formData.append('file', fileToUpload)
+    formData.append('user_id', user.value.userId)
+    formData.append('server_name', 'wine')
 
-  // const rs = await uploadFile(formData)
-  // if (rs.status === 200) {
-  //   const idFile = rs.data.data[0].id
-  //   if (!Array.isArray(infoEvent.value.fileVaultIds) || !infoEvent.value.fileVaultIds) {
-  //     infoEvent.value.fileVaultIds = []
-  //   }
-  //   infoEvent.value.fileVaultIds.push(idFile)
-  //   if (!Array.isArray(infoEvent.value.fileVaults) || !infoEvent.value.fileVaults) {
-  //     infoEvent.value.fileVaults = []
-  //   }
-  //   infoEvent.value.fileVaults.push(rs.data.data[0])
-  // }
+    const rs = await uploadFile(formData)
+    if (!Array.isArray(infoProduct.value.images)) {
+      infoProduct.value.images = []
+    }
+    if (rs.code === 201) {
+      infoProduct.value.images.push({
+        url: rs.data.filePath
+      })
+    } else {
+      const index = fileList.indexOf(file)
+      if (index > -1) {
+        fileList.splice(index, 1)
+      }
+      ElMessage.error('Tải file thất bại')
+      return false
+    }
+  } catch (e) {
+    const index = fileList.indexOf(file)
+    if (index > -1) {
+      fileList.splice(index, 1)
+    }
+    console.log(e)
+    ElMessage.error('Tải file thất bại')
+    return false
+  }
 }
 const handlePreview = file => {
   if (file.url) {
@@ -381,7 +484,7 @@ const handlePreview = file => {
     ElMessage.error('Không thể xem trước file này')
   }
 }
-const beforeRemove = () => {
+const beforeRemove = (file, fileList) => {
   return ElMessageBox.confirm(t('administration.ip.confirmDeleteFile'), {
     confirmButtonText: t('omsSetting.confirm'),
     cancelButtonText: t('omsSetting.cancel'),
@@ -389,22 +492,23 @@ const beforeRemove = () => {
     cancelButtonClass: 'el-button--secondary',
     buttonSize: 'default',
   }).then(
-    () => true,
+    () => {
+      const index = fileList.indexOf(file)
+      if (index > -1) {
+        indexDeleteFile.value = index
+      }
+      return true
+    },
     () => false
   )
 }
-const handleRemove = file => {
-  const item = infoProduct.value.fileVaults
-  const length = item.length
-  let id_file = ''
-  for (let i = 0; i < length; i++) {
-    if (file.name === item[i].fileName) {
-      id_file = item[i].id
-      break
-    }
-  }
-  infoProduct.value.fileVaults = infoProduct.value.fileVaults.filter(item => item.id !== id_file)
-  infoProduct.value.fileVaultIds = infoProduct.value.fileVaultIds.filter(item => item !== id_file)
+const indexDeleteFile = ref(null)
+const handleRemove = (file, fileList) => {
+  console.log(indexDeleteFile.value, 'vị trí xóa')
+  console.log(infoProduct.value.images, 'trước khi xóa')
+  infoProduct.value.images.splice(indexDeleteFile.value, 1)
+  console.log(infoProduct.value.images, 'sau khi xóa')
+  indexDeleteFile.value = null
 }
 
 const backProduct = () => {
