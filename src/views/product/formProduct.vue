@@ -28,7 +28,7 @@
       </div>
     </div>
     <!--  Content  -->
-    <div class="px-6 mt-4 content-page">
+    <div class="px-6 my-4 content-page">
       <div class="bg-white px-5 pt-6 pb-4">
         <el-form ref="formProduct" :rules="ruleEdit" :model="infoProduct">
           <div class="flex items-center justify-between">
@@ -49,6 +49,24 @@
                   maxlength="250"
                   :placeholder="$t('configUser.pleaseEnter')"
                 />
+              </el-form-item>
+            </el-col>
+            <el-col :md="12" :sm="12" :span="24">
+              <el-form-item prop="category.id" label="Danh mục sản phẩm">
+                <el-select
+                  v-model="infoProduct.category.id"
+                  clearable
+                  collapse-tags
+                  style="width: 100%"
+                  :placeholder="$t('configUser.pleaseSelect')"
+                >
+                  <el-option
+                    v-for="(item, index) in categories"
+                    :key="index"
+                    :label="item.name"
+                    :value="item.id"
+                  ></el-option>
+                </el-select>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :span="24">
@@ -91,75 +109,6 @@
                 <el-input v-model="attribute.value"></el-input>
               </el-form-item>
             </el-col>
-            <el-col :md="12" :sm="12" :span="24">
-              <el-form-item label="Số nhóm biến thể">
-                <el-input
-                  v-model="nbVariant"
-                  type="number"
-                  :placeholder="$t('configUser.pleaseEnter')"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :md="12" :sm="12" :span="24">
-              <el-form-item prop="category.id" label="Danh mục sản phẩm">
-                <el-select
-                  v-model="infoProduct.category.id"
-                  clearable
-                  collapse-tags
-                  style="width: 100%"
-                  :placeholder="$t('configUser.pleaseSelect')"
-                >
-                  <el-option
-                    v-for="(item, index) in categories"
-                    :key="index"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="24" class="mt-2"></el-col>
-            <el-col v-for="(variant, index) in infoProduct.productVariants" :key="index" :span="24" class="mt-2">
-              <el-card>
-                <el-row :gutter="12">
-                  <el-col :span="8">
-                    <h6 class="text-sm w-100">Giá</h6>
-                    <el-input v-model="variant.price" type="number"></el-input>
-                  </el-col>
-                  <el-col :span="8">
-                    <h6 class="text-sm w-100">Số lượng</h6>
-                    <el-input v-model="variant.quantity" type="number"></el-input>
-                  </el-col>
-                  <el-col :span="8">
-                    <h6 class="text-sm w-100">Thuộc tính</h6>
-                    <el-select
-                      v-model="variant.attributes"
-                      multiple
-                      clearable
-                      collapse-tags
-                      style="width: 100%"
-                      @change="(value) => {setAttributeVariant(value, index)}"
-                    >
-                      <el-option
-                        v-for="(item, indexList) in attributes"
-                        :key="indexList"
-                        :label="item.name"
-                        :value="item.id"
-                      ></el-option>
-                    </el-select>
-                  </el-col>
-                  <el-col v-for="(attributeId, indexAttribute) in variant.variantAttributes" :key="indexAttribute" :span="8">
-                    <el-form-item :label="getAttributeName(attributeId)">
-                      <el-input
-                        v-model="attributeId.value"
-                        placeholder="Nhập giá trị">
-                      </el-input>
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-              </el-card>
-            </el-col>
-            <el-col :span="24" class="mt-2"></el-col>
             <el-col :span="24">
               <el-form-item
                 prop="description"
@@ -181,7 +130,7 @@
               </h6>
               <el-upload
                 v-model:file-list="infoProduct.listImage"
-                class="avatar-uploader mt-3 custom-upload-list w-full"
+                class="avatar-uploader mt-1 custom-upload-list w-full"
                 drag
                 :on-success="null"
                 :on-preview="null"
@@ -212,10 +161,63 @@
                 </p>
               </el-upload>
             </el-col>
+            <div class="w-full my-2 px-3">
+              <el-button @click="showAddVariants" class="bg-outline-info text--info mb-2">Thêm loại sản phẩm</el-button>
+              <el-card
+                v-for="(variantProduct, index) in infoProduct.productVariants"
+                :key="index"
+              >
+                <div class="flex w-full">
+                  <div class="w-1/3 flex">
+                    <h5 class="tag-variant w-1/3">Tên loại sản phẩm</h5>
+                    <h5 class="tag-variant-info w-2/3">{{ variantProduct.name }}</h5>
+                  </div>
+                  <div class="w-1/3 flex">
+                    <h5 class="tag-variant w-1/3">Giá</h5>
+                    <h5 class="tag-variant-info w-2/3">{{ variantProduct.price }}</h5>
+                  </div>
+                  <div class="w-1/3 flex">
+                    <h5 class="tag-variant w-1/3">Mã loại sản phẩm</h5>
+                    <h5 class="tag-variant-info w-2/3">{{ variantProduct.codeVariant }}</h5>
+                  </div>
+                </div>
+                <div class="w-full flex">
+                  <h5 class="tag-variant w-1/3">Mô tả sản phẩm</h5>
+                  <h5 class="tag-variant-info w-2/3">{{ variantProduct.name }}</h5>
+                </div>
+                <div class="flex w-full flex-wrap">
+                  <div class="w-1/3 flex" v-for="(attribute, index) in variantProduct.variantAttributes" :key="index">
+                    <h5 class="tag-variant w-1/3">{{ attribute.attribute.name}}</h5>
+                    <h5 class="tag-variant-info w-2/3">{{ attribute.value }}</h5>
+                  </div>
+                </div>
+                <div>
+                  <el-button class="bg-outline-success text--success mt-3">Sửa</el-button>
+                </div>
+              </el-card>
+            </div>
           </el-row>
         </el-form>
       </div>
     </div>
+
+    <!--  Dialog  -->
+    <Dialog
+      :show="showModalVariants"
+      :appendToBody="true"
+      :width="'682'"
+      :title="titleDialog"
+      @closeDialog="handleCloseDialog"
+    >
+      <template v-slot:content>
+        <ModalVariant
+          :is-create="typeDialog"
+          :is-edit="!typeDialog"
+          @addVariants="handleAddVariantProduct"
+          @closeUpdate="handleCloseDialog"
+        />
+      </template>
+    </Dialog>
   </div>
 </template>
 
@@ -225,6 +227,8 @@ import { useI18n } from '@/locale'
 import {useRoute, useRouter} from 'vue-router'
 import {apiGetAttribute, apiGetCategory, uploadFile} from '@/api/product'
 import {ElMessage, ElMessageBox} from 'element-plus'
+import Dialog from '@/components/Dialog/index.vue'
+import ModalVariant from '@/views/product/component/ModalVariant.vue'
 
 const props = defineProps({
   isView: {
@@ -260,6 +264,11 @@ const infoProduct = ref({
   productVariants: [],
 })
 const formProduct = ref(null)
+
+const showModalVariants = ref(false)
+const titleDialog = ref('Thêm mới loại sản phẩm')
+const typeDialog = ref(false)
+const infoVariant = ref({})
 
 const attributes = ref([])
 const attributeCache = ref([])
@@ -340,34 +349,6 @@ const validFormData = async () => {
   })
 }
 // Thuộc tính và biến thể
-watch(nbVariant, (newVal) => {
-  if (!newVal || isNaN(newVal) || newVal < 0) {
-    nbVariant.value = 0
-    return
-  }
-  if (!Array.isArray(infoProduct.value.productVariants)) {
-    infoProduct.value.productVariants = []
-  }
-  const currentVariants = infoProduct.value.productVariants.length
-
-  if (newVal > currentVariants) {
-    for (let i = currentVariants; i < newVal; i++) {
-      // eslint-disable-next-line no-undef
-      const existingVariant = savedVariants.value?.[i] || {
-        name: `Variant ${i + 1}`,
-        price: 0,
-        quantity: 0,
-        variantAttributes: [],
-        variantAttributesValue: {}
-      }
-      infoProduct.value.productVariants.push(existingVariant)
-    }
-  } else if (newVal < currentVariants) {
-    // eslint-disable-next-line no-undef
-    savedVariants.value = infoProduct.value.productVariants.slice()
-    infoProduct.value.productVariants.splice(newVal)
-  }
-})
 const setAttribute = (selectedAttributes) => {
   if (!attributeCache.value) {
     attributeCache.value = []
@@ -389,33 +370,15 @@ const setAttribute = (selectedAttributes) => {
     return null
   }).filter((item) => item !== null)
 }
-
-const setAttributeVariant = (selectedAttributes, index) => {
-  if (!attributeCache[index]) {
-    attributeCache[index] = {}
-  }
-
-  const currentAttributes = infoProduct.value.productVariants[index]?.variantAttributes || []
-  currentAttributes.forEach((attribute) => {
-    if (attribute?.attributeId) {
-      attributeCache[index][attribute.attributeId] = attribute.value || ''
-    }
-  })
-
-  infoProduct.value.productVariants[index].variantAttributes = selectedAttributes.map((attributeId) => {
-    const existingValue = attributeCache[index][attributeId] || ''
-    const attributeName = attributes.value.find((item) => item.id === attributeId)?.name || ''
-
-    return {
-      attributeId,
-      value: existingValue,
-      name: attributeName,
-    }
-  })
+const showAddVariants = () => {
+  titleDialog.value = 'Thêm mới loại sản phẩm'
+  typeDialog.value = true
+  infoVariant.value = {}
+  showModalVariants.value = true
 }
-const getAttributeName = (attributeId) => {
-  const attribute = attributes.value.find(attr => attr.id === attributeId?.attributeId)
-  return attribute ? attribute.name : 'Thuộc tính'
+const handleAddVariantProduct = (variant) => {
+  console.log(variant, 'info')
+  infoProduct.value.productVariants.push(variant)
 }
 // File
 const handleChangeFile = async (file, fileList) => {
@@ -511,12 +474,31 @@ const handleRemove = (file, fileList) => {
   indexDeleteFile.value = null
 }
 
+const handleCloseDialog = () => {
+  showModalVariants.value = false
+}
 const backProduct = () => {
   router.push('/product/manage')
 }
 </script>
 
 <style lang="scss">
+.tag-variant {
+  background-color: #F8F8F8;
+  height: 40px;
+  border: 1px solid #EAE8F1;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+}
+.tag-variant-info {
+  height: 40px;
+  border: 1px solid #EAE8F1;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+}
+
 .custom-upload-list {
   display: flex;
   flex-wrap: wrap;
