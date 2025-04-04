@@ -66,6 +66,15 @@
           <template #viewCount="{ row }">
             <p class="text-center">{{ row.viewCount }}</p>
           </template>
+          <template #image="{ row }">
+            <img
+                v-if="getPrimaryImage(row)"
+                :src="getPrimaryImage(row)"
+                alt="Product Image"
+                class="product-image"
+            />
+            <span v-else>Không có ảnh</span>
+          </template>
           <template #action="{ row }">
               <span
                 @click.stop="handleEditProduct(row)"
@@ -147,6 +156,7 @@ import Dialog from '@/components/Dialog/index.vue'
 import { ElMessage } from 'element-plus'
 import FormCategory from '@/views/category/FormCategory.vue'
 import {useRouter} from 'vue-router'
+import {useConfig} from '@/config'
 const { t } = useI18n()
 const router = useRouter()
 const fields = ref([
@@ -159,11 +169,6 @@ const fields = ref([
     key: 'description',
     label: 'Mô tả',
     prop: 'description',
-  },
-  {
-    key: 'price',
-    label: 'Giá',
-    prop: 'price',
   },
   {
     key: 'category',
@@ -222,6 +227,12 @@ const getList = async () => {
   }
   listLoading.value = false
 }
+const config = useConfig()
+const baseUrl = ref(config.VITE_PROXY_DOMAIN)
+const getPrimaryImage = (row) => {
+  const img = row.images?.find(i => i.isPrimary) || row.images?.[0]
+  return img ? baseUrl.value + 'media-service/api/v1.0/images' + img.url.replace(/^\.\/uploads/, '/uploads') : null
+}
 
 const handleAddProduct = () => {
   router.push('/product/manage/add')
@@ -279,5 +290,11 @@ const handlePageChange = page => {
   cursor: pointer;
   font-weight: 800;
   color: #0078d4;
+}
+.product-image {
+  width: 100px;  /* Điều chỉnh chiều rộng */
+  height: 100px; /* Điều chỉnh chiều cao */
+  object-fit: cover; /* Cắt ảnh cho vừa khung mà không méo */
+  border-radius: 8px; /* Bo góc ảnh */
 }
 </style>

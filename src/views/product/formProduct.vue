@@ -84,7 +84,6 @@
                   collapse-tags
                   @change="setAttribute"
                   :placeholder="$t('configUser.pleaseSelect')"
-                  :disabled="isEdit || isView"
                 >
                   <el-option
                     v-for="item in attributes"
@@ -363,7 +362,7 @@ const handleUpdateProduct = async () => {
       validFormData()
     ])
     processing.value = true
-    const params = formatValidValue()
+    const params = formatValidValueUpdate()
     const rs = await apiUpdateProduct(id_product.value, params)
     if (rs.code === 200) {
       ElMessage({
@@ -427,6 +426,36 @@ const formatValidValue = () => {
     variants: variant
   }
 }
+const formatValidValueUpdate = () => {
+  const variant = infoProduct.value.productVariants.map((item) => ({
+    variantId: item.id,
+    variantCode: item.variantCode,
+    variantName: item.variantName,
+    price: item.price,
+    attributes: item.variantAttributes.map((attribute) => ({
+      value: attribute.value,
+      attributeId: attribute.attribute.id,
+      productAttributeId: attribute.productVariantAttributeId,
+    })),
+  }))
+
+  const attributesProductLst = infoProduct.value.productAttributes.map((content) => ({
+    productAttributeId: content.id || null,
+    attributeId: content.attribute.id,
+    value: content.value,
+  }))
+
+  return {
+    name: infoProduct.value.name,
+    description: infoProduct.value.description,
+    categoryId: infoProduct.value.category.id,
+    attributes: attributesProductLst,
+    images: infoProduct.value.images,
+    variants: variant,
+    isUpdate: true,
+  }
+}
+
 const convertDataProduct = (productData) => {
   infoProduct.value.attributes = []
   productData.productAttributes.forEach((attribute) => {
@@ -440,7 +469,6 @@ const convertDataProduct = (productData) => {
       url: baseUrl.value + 'media-service/api/v1.0/images' + image.url.replace(/^\.\/uploads/, '/uploads')
     })
   })
-  console.log(imagesProduct.value.listImage, imagesProduct, 'list')
 }
 // Thuộc tính và biến thể
 const setAttribute = (selectedAttributes) => {
