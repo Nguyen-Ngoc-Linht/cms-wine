@@ -44,7 +44,7 @@ export default {
       },
     },
     {
-      path: 'manage/edit/?:id',
+      path: 'manage/edit/:id',
       name: 'product-manage-edit',
       component: () => import('@/views/product/edit.vue'),
       meta: {

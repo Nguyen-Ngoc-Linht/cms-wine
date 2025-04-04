@@ -13,11 +13,11 @@
           <el-form-item
             class="custom mb-5"
             label="Tên loại sản phẩm"
-            prop="name"
+            prop="variantName"
             style="font-weight: 600 !important; width: 100%; display: inline-block"
           >
             <el-input
-              v-model="infoVariants.name"
+              v-model="infoVariants.variantName"
               :placeholder="$t('configUser.pleaseEnter')"
             />
           </el-form-item>
@@ -31,6 +31,7 @@
           >
             <InputInteger
               v-model="infoVariants.price"
+              :is-format="true"
               :max-length="12"
               :placeholder="$t('configUser.pleaseEnter')"
             />
@@ -40,11 +41,11 @@
           <el-form-item
             class="custom mb-5"
             label="Mã loại sản phẩm"
-            prop="codeVariant"
+            prop="variantCode"
             style="font-weight: 600 !important; width: 100%; display: inline-block"
           >
             <el-input
-              v-model="infoVariants.codeVariant"
+              v-model="infoVariants.variantCode"
               maxlength="50"
               :placeholder="$t('configUser.pleaseEnter')"
             />
@@ -164,19 +165,20 @@ const props = defineProps({
 })
 
 const ruleEdit = ref({
-  name: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' },],
+  variantName: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' },],
   price: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' },],
   description: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
-  codeVariant: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
+  variantCode: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
   attributes: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
   variantAttributes: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
 })
 const processing = ref(false)
 const formVariants = ref(null)
 const infoVariants = ref({
+  variantName: null,
   price: null,
   description: null,
-  codeVariant: null,
+  variantCode: null,
   attributes: null,
   variantAttributes: [],
 })
@@ -206,7 +208,20 @@ const setDataDefault = async () => {
     console.log(e)
   }
 }
-const initData = () => {}
+const initData = () => {
+  console.log(props.isEdit, props.isCreate, 'prop')
+  if (props.isEdit) {
+    infoVariants.value = {
+      variantName: props.variant.variantName,
+      price: props.variant.price,
+      description: props.variant.description,
+      variantCode: props.variant.variantCode,
+      attributes: props.variant.attributes,
+      variantAttributes: props.variant.variantAttributes,
+    }
+    console.log(infoVariants.value, 'thoong rin')
+  }
+}
 
 const handleAddVariants = async () => {
   try {
@@ -227,6 +242,7 @@ const handleUpdateVariants = async () => {
       validFormData()
     ])
     processing.value = true
+    emit('editVariants', infoVariants.value)
     processing.value = false
   } catch (e) {
     processing.value = false
@@ -268,7 +284,7 @@ const setAttribute = (selectedAttributes) => {
   }).filter((item) => item !== null)
 }
 
-const emit = defineEmits(['closeUpdate', 'addVariants'])
+const emit = defineEmits(['closeUpdate', 'addVariants', 'editVariants'])
 const closeDialog = () => {
   emit('closeUpdate')
 }

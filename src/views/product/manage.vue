@@ -68,7 +68,7 @@
           </template>
           <template #action="{ row }">
               <span
-                @click.stop="openEditCategory(row)"
+                @click.stop="handleEditProduct(row)"
                 class="delete-member pointer ms-2 me-3"
               >
                 <svg-icon
@@ -225,6 +225,9 @@ const getList = async () => {
 
 const handleAddProduct = () => {
   router.push('/product/manage/add')
+}
+const handleEditProduct = (data) => {
+  router.push(`/product/manage/edit/${data.id}`)
 }
 const openAddProduct = () => {
   titleDialog.value = 'Thêm danh mục'

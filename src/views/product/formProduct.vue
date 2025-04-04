@@ -147,16 +147,10 @@
                   icon-class="import-dialog"
                   class="width-50 height-50"
                 />
-                <p
-                  class="drag-note my-2 font-semibold"
-                  style="color: #7c7e81"
-                >
+                <p class="drag-note my-2 font-semibold" style="color: #7c7e81">
                   {{ t('configUser.importImage') }}
                 </p>
-                <p
-                  class="file-note text-center"
-                  style="color: #a4a6a7"
-                >
+                <p class="file-note text-center" style="color: #a4a6a7">
                   ({{ $t('configUser.importLimitAndType', ['Jpg/Png', '10MB']) }})
                 </p>
               </el-upload>
@@ -170,20 +164,20 @@
                 <div class="flex w-full">
                   <div class="w-1/3 flex">
                     <h5 class="tag-variant w-1/3">Tên loại sản phẩm</h5>
-                    <h5 class="tag-variant-info w-2/3">{{ variantProduct.name }}</h5>
+                    <h5 class="tag-variant-info w-2/3">{{ variantProduct.variantName }}</h5>
                   </div>
                   <div class="w-1/3 flex">
                     <h5 class="tag-variant w-1/3">Giá</h5>
-                    <h5 class="tag-variant-info w-2/3">{{ variantProduct.price }}</h5>
+                    <h5 class="tag-variant-info w-2/3">{{ formatNumber(variantProduct.price, '.') }}</h5>
                   </div>
                   <div class="w-1/3 flex">
                     <h5 class="tag-variant w-1/3">Mã loại sản phẩm</h5>
-                    <h5 class="tag-variant-info w-2/3">{{ variantProduct.codeVariant }}</h5>
+                    <h5 class="tag-variant-info w-2/3">{{ variantProduct.variantCode }}</h5>
                   </div>
                 </div>
                 <div class="w-full flex">
                   <h5 class="tag-variant w-1/3">Mô tả sản phẩm</h5>
-                  <h5 class="tag-variant-info w-2/3">{{ variantProduct.name }}</h5>
+                  <h5 class="tag-variant-info w-2/3">{{ variantProduct.description }}</h5>
                 </div>
                 <div class="flex w-full flex-wrap">
                   <div class="w-1/3 flex" v-for="(attribute, index) in variantProduct.variantAttributes" :key="index">
@@ -191,8 +185,9 @@
                     <h5 class="tag-variant-info w-2/3">{{ attribute.value }}</h5>
                   </div>
                 </div>
-                <div>
-                  <el-button class="bg-outline-success text--success mt-3">Sửa</el-button>
+                <div class="flex items-center">
+                  <el-button @click="handleEditVariant(index)" class="bg-outline-success text--success mt-3">Sửa</el-button>
+                  <el-button @click="handleDeleteVariant(index)" class="bg-outline-danger text--danger mt-3">Xóa</el-button>
                 </div>
               </el-card>
             </div>
@@ -213,7 +208,9 @@
         <ModalVariant
           :is-create="typeDialog"
           :is-edit="!typeDialog"
+          :variant="infoVariant"
           @addVariants="handleAddVariantProduct"
+          @editVariants="handleEditVariantProduct"
           @closeUpdate="handleCloseDialog"
         />
       </template>
@@ -222,13 +219,22 @@
 </template>
 
 <script setup>
-import {onMounted, ref, watch} from 'vue'
-import { useI18n } from '@/locale'
+import {onMounted, ref} from 'vue'
+import {useI18n} from '@/locale'
 import {useRoute, useRouter} from 'vue-router'
-import {apiGetAttribute, apiGetCategory, uploadFile} from '@/api/product'
+import {
+  apiCreateProduct,
+  apiGetAttribute,
+  apiGetCategory,
+  apiGetDetailProduct,
+  apiUpdateProduct,
+  uploadFile
+} from '@/api/product'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import Dialog from '@/components/Dialog/index.vue'
 import ModalVariant from '@/views/product/component/ModalVariant.vue'
+import {formatNumber} from '@/utils'
+import {useConfig} from '@/config'
 
 const props = defineProps({
   isView: {
@@ -252,7 +258,7 @@ const ruleEdit = ref({
     id: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
   }
 })
-const nbVariant = ref(0)
+const id_product = ref(null)
 const infoProduct = ref({
   name: '',
   attributes: [],
@@ -264,11 +270,14 @@ const infoProduct = ref({
   productVariants: [],
 })
 const formProduct = ref(null)
+const config = useConfig()
+const baseUrl = ref(config.VITE_PROXY_DOMAIN)
 
 const showModalVariants = ref(false)
 const titleDialog = ref('Thêm mới loại sản phẩm')
 const typeDialog = ref(false)
 const infoVariant = ref({})
+const indexVariant = ref(0)
 
 const attributes = ref([])
 const attributeCache = ref([])
@@ -279,6 +288,7 @@ const processing = ref(false)
 onMounted(() => {
   user.value = JSON.parse(localStorage.getItem('userInfo'))
   setDataDefault()
+  initData()
 })
 
 const setDataDefault = async () => {
@@ -310,14 +320,37 @@ const setDataDefault = async () => {
     console.log(e)
   }
 }
+const initData = async () => {
+  try {
+    id_product.value = route.params.id
+    if ( id_product.value) {
+      const rs = await apiGetDetailProduct(id_product.value)
+      if (rs.code === 200) {
+        infoProduct.value = rs.data
+        convertDataProduct(rs.data)
+      }
+    }
+  } catch (e) {
+    console.log(e)
+  }
+}
 
 const handleAddProduct = async () => {
   try {
-    // await Promise.all([
-    //   validFormData()
-    // ])
-    console.log(infoProduct.value, 'info')
+    await Promise.all([
+      validFormData()
+    ])
     processing.value = true
+    const params = formatValidValue()
+    const rs = await apiCreateProduct(params)
+    if (rs.code === 201) {
+      ElMessage({
+        message: 'Thêm sản phẩm thành công',
+        type: 'success',
+        duration: 3 * 1000,
+      })
+      backProduct()
+    }
     processing.value = false
   } catch (e) {
     processing.value = false
@@ -330,6 +363,16 @@ const handleUpdateProduct = async () => {
       validFormData()
     ])
     processing.value = true
+    const params = formatValidValue()
+    const rs = await apiUpdateProduct(id_product.value, params)
+    if (rs.code === 200) {
+      ElMessage({
+        message: 'Cập nhật sản phẩm thành công',
+        type: 'success',
+        duration: 3 * 1000,
+      })
+      backProduct()
+    }
     processing.value = false
   } catch (e) {
     processing.value = false
@@ -347,6 +390,57 @@ const validFormData = async () => {
       }
     })
   })
+}
+const formatValidValue = () => {
+  const variant = []
+  const variantProduct = infoProduct.value.productVariants
+  variantProduct.forEach((item) => {
+    const attributeVariant = item.variantAttributes
+    const attributes = []
+    attributeVariant.forEach((attribute) => {
+      attributes.push({
+        value: attribute.value,
+        attributeId: attribute.attribute.id
+      })
+    })
+    variant.push({
+      variantCode: item.variantCode,
+      variantName: item.variantName,
+      price: item.price,
+      attributes
+    })
+  })
+  const attributesProductLst = []
+  const attributeProduct = infoProduct.value.productAttributes
+  attributeProduct.forEach((content) => {
+    attributesProductLst.push({
+      attributeId: content.attribute.id,
+      value: content.value
+    })
+  })
+  return {
+    name: infoProduct.value.name,
+    description: infoProduct.value.description,
+    categoryId: infoProduct.value.category.id,
+    attributes: attributesProductLst,
+    images: infoProduct.value.images,
+    variants: variant
+  }
+}
+const convertDataProduct = (productData) => {
+  infoProduct.value.attributes = []
+  productData.productAttributes.forEach((attribute) => {
+    infoProduct.value.attributes.push(attribute.attribute.id)
+  })
+  const imagesProduct = infoProduct.value.images
+  infoProduct.value.listImage = []
+  imagesProduct.forEach((image) => {
+    infoProduct.value.listImage.push({
+      name: 'item' + image.id,
+      url: baseUrl.value + 'media-service/api/v1.0/images' + image.url.replace(/^\.\/uploads/, '/uploads')
+    })
+  })
+  console.log(imagesProduct.value.listImage, imagesProduct, 'list')
 }
 // Thuộc tính và biến thể
 const setAttribute = (selectedAttributes) => {
@@ -379,7 +473,21 @@ const showAddVariants = () => {
 const handleAddVariantProduct = (variant) => {
   console.log(variant, 'info')
   infoProduct.value.productVariants.push(variant)
+  showModalVariants.value = false
 }
+const handleEditVariantProduct = (variant) => {
+  console.log(variant, 'info')
+  infoProduct.value.productVariants[indexVariant.value] = variant
+  showModalVariants.value = false
+}
+const handleEditVariant = (index) => {
+  indexVariant.value = index
+  titleDialog.value = 'Sửa loại sản phẩm'
+  typeDialog.value = false
+  infoVariant.value = infoProduct.value.productVariants[index]
+  showModalVariants.value = true
+}
+const handleDeleteVariant = (index) => {}
 // File
 const handleChangeFile = async (file, fileList) => {
   try {

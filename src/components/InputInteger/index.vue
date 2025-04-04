@@ -1,7 +1,7 @@
 <template>
   <el-input
     v-bind="$attrs"
-    v-model="inputValue"
+    v-model="formattedValue"
     :placeholder="placeholder"
     :type="typeInput"
     @keydown="handleKeyPress"
@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, watch, useAttrs, defineProps, defineEmits } from 'vue'
+import {ref, watch, useAttrs, defineProps, defineEmits, computed} from 'vue'
 
 const $attrs = useAttrs()
 const emit = defineEmits(['update:modelValue', 'change', 'blur', 'focus', 'input'])
@@ -55,9 +55,17 @@ const props = defineProps({
     type: String,
     default: 'text',
   },
+  isFormat: {
+    type: Boolean,
+    default: false,
+  }
 })
 
 const inputValue = ref(props.modelValue)
+const formattedValue = computed(() => {
+  if (!props.isFormat || !inputValue.value) return inputValue.value
+  return inputValue.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+})
 watch(
   () => props.modelValue,
   newVal => {
@@ -92,7 +100,7 @@ const onInput = value => {
 }
 
 const handleKeyPress = event => {
-  const allowedKeys = ['Backspace', 'Delete', 'Enter', 'ArrowLeft', 'ArrowRight']
+  const allowedKeys = ['Backspace', 'Delete', 'Enter', 'ArrowLeft', 'ArrowRight', 'Tab']
 
   const isCtrlKey = event.ctrlKey && (event.key === 'v' || event.key === 'c')
 

@@ -12,6 +12,29 @@ export function apiGetProduct(data) {
   })
 }
 
+export function apiGetDetailProduct(id_product) {
+  return http.request({
+    method: 'get',
+    url: `/wine-service/api/v1.0/managements/products/${id_product}`,
+  })
+}
+
+export function apiCreateProduct(data) {
+  return http.request({
+    method: 'post',
+    url: '/wine-service/api/v1.0/managements/products',
+    data,
+  })
+}
+
+export function apiUpdateProduct(id_product, data) {
+  return http.request({
+    method: 'put',
+    url: `/wine-service/api/v1.0/managements/products/${id_product}`,
+    data,
+  })
+}
+
 export function apiDeleteProduct(product_id) {
   return http.request({
     method: 'delete',
