@@ -8,6 +8,7 @@ import dashboard from './modules/dashboard'
 import order from './modules/order'
 import setting from './modules/setting'
 import report from './modules/report'
+import inventory from '@/router/modules/inventory'
 
 export const constantRoutes = [
   {
@@ -88,6 +89,7 @@ export const asyncRoutes = [
   home,
   dashboard,
   product,
+  inventory,
   order,
   user,
   report,

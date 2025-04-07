@@ -14,7 +14,7 @@ export default {
   children: [
     {
       path: '',
-      name: 'dashboard',
+      name: 'dashboard-ch',
       component: () => import('@/views/dashboard/index.vue'),
       meta: {
         title: 'Dashboard',
