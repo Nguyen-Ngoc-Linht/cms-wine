@@ -94,7 +94,21 @@
                 </el-select>
               </el-form-item>
             </el-col>
-            <el-col v-if="infoProduct.attributes.length > 0" :span="24">
+            <el-col :sm="12" :span="24">
+              <el-form-item
+                label="Tiêu đề sản phẩm"
+                prop="title"
+                class="custom mb-2"
+                style="display: inline-block; width: 100%"
+              >
+                <el-input
+                  v-model="infoProduct.title"
+                  maxlength="200"
+                  :placeholder="$t('configUser.pleaseEnter')"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col v-if="infoProduct.attributes && infoProduct.attributes.length > 0" :span="24">
               <h6 class="text-md font-bold mb-0">Danh sách thuộc tính</h6>
             </el-col>
             <el-col
@@ -109,21 +123,26 @@
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item
-                prop="description"
-                label="Mô tả sản phẩm"
-                style="display: inline-block; width: 100%;"
-              >
-                <el-input
-                  v-model="infoProduct.description"
-                  type="textarea"
-                  show-word-limit
-                  maxlength="5000"
-                  :autosize="{ minRows: 4, maxRows: 5 }"
-                ></el-input>
-              </el-form-item>
+              <description-product
+                :name-product="infoProduct.name"
+                :tag-name="infoProduct.category?.name"
+                v-model:description="infoProduct.description"
+              ></description-product>
+<!--              <el-form-item-->
+<!--                prop="description"-->
+<!--                label="Mô tả sản phẩm"-->
+<!--                style="display: inline-block; width: 100%;"-->
+<!--              >-->
+<!--                <el-input-->
+<!--                  v-model="infoProduct.description"-->
+<!--                  type="textarea"-->
+<!--                  show-word-limit-->
+<!--                  maxlength="5000"-->
+<!--                  :autosize="{ minRows: 4, maxRows: 5 }"-->
+<!--                ></el-input>-->
+<!--              </el-form-item>-->
             </el-col>
-            <el-col :span="24">
+            <el-col :span="24" class="mt-3">
               <h6 class="font-bold text-base custom">
                 Ảnh sản phẩm
               </h6>
@@ -234,6 +253,7 @@ import Dialog from '@/components/Dialog/index.vue'
 import ModalVariant from '@/views/product/component/ModalVariant.vue'
 import {formatNumber} from '@/utils'
 import {useConfig} from '@/config'
+import DescriptionProduct from '@/views/product/component/DescriptionProduct.vue'
 
 const props = defineProps({
   isView: {
@@ -252,6 +272,7 @@ const user = ref({})
 
 const ruleEdit = ref({
   name: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
+  title: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
   attributes: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
   category: {
     id: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
@@ -363,6 +384,7 @@ const handleUpdateProduct = async () => {
     ])
     processing.value = true
     const params = formatValidValueUpdate()
+    console.log(params, 'day')
     const rs = await apiUpdateProduct(id_product.value, params)
     if (rs.code === 200) {
       ElMessage({
@@ -447,7 +469,7 @@ const formatValidValueUpdate = () => {
 
   return {
     name: infoProduct.value.name,
-    description: infoProduct.value.description,
+    description: JSON.stringify(infoProduct.value.description),
     categoryId: infoProduct.value.category.id,
     attributes: attributesProductLst,
     images: infoProduct.value.images,
@@ -469,6 +491,7 @@ const convertDataProduct = (productData) => {
       url: baseUrl.value + 'media-service/api/v1.0/images' + image.url.replace(/^\.\/uploads/, '/uploads')
     })
   })
+  infoProduct.value.description = JSON.parse(infoProduct.value.description)
 }
 // Thuộc tính và biến thể
 const setAttribute = (selectedAttributes) => {

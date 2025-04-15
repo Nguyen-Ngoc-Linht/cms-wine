@@ -59,6 +59,30 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :span="24">
+            <el-form-item
+              class="custom mb-5"
+              label="Tìm kiếm theo"
+              prop="typeSearch"
+              style="display: inline-block; width: 100%"
+            >
+              <el-select
+                v-model="infoAttributes.typeSearch"
+                clearable
+                filterable
+                collapse-tags
+                style="width: 100%"
+                :placeholder="$t('configUser.pleaseSelect')"
+              >
+                <el-option
+                  v-for="type in lstTypeSearch"
+                  :key="type.id"
+                  :label="type.name"
+                  :value="type.value"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-form>
       <hr class="margin-bottom-24 mt-3"/>
@@ -117,11 +141,29 @@ const ruleEdit = ref({
   ],
   description: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
   dataType: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
+  typeSearch: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
 })
 const infoAttributes = ref({})
 const formAttributes = ref(null)
 const processing = ref(false)
 const emit = defineEmits(['closeUpdate'])
+const lstTypeSearch = ref([
+  {
+    id: 1,
+    name: 'Khoảng',
+    value: 'about',
+  },
+  {
+    id: 2,
+    name: 'Chọn',
+    value: 'select',
+  },
+  {
+    id: 3,
+    name: 'Nhập',
+    value: 'enter',
+  },
+])
 
 const closeDialog = () => {
   emit('closeUpdate')

@@ -4,7 +4,7 @@
       <el-pagination
         :current-page="page"
         :page-size="size"
-        :page-sizes="[10, 15, 20]"
+        :page-sizes="[10, 15, 20, 50]"
         :small="small"
         :disabled="disabled"
         :background="background"

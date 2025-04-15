@@ -137,7 +137,9 @@
 
           <el-col :span="12">
             <el-form-item label="Giá nhập" prop="costPrice">
-              <el-input v-model="importGoods.costPrice" type="number"/>
+              <el-input
+                v-model="importGoods.costPrice"
+                type="number"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -232,6 +234,7 @@ import FormCategory from '@/views/category/FormCategory.vue'
 import {apiGetVariants, apiImportGoods, apiUpdateVariant} from '@/api/inventory'
 import Pagination from '@/components/Pagination/index.vue'
 import {formatNumber} from '@/utils'
+import ElInputInteger from '@/components/InputInteger/index.vue'
 
 const { t } = useI18n()
 
@@ -478,6 +481,15 @@ const handleUpdateVariant = async (variant_id) => {
     ElMessage.error(error.response?.data?.message || 'Lỗi kết nối đến server!')
   }
 }
+const handleSizeChange = size => {
+  filter.size = size
+  getList()
+}
+const handlePageChange = page => {
+  filter.page = page
+  getList()
+}
+
 </script>
 
 <style lang="scss" scoped>

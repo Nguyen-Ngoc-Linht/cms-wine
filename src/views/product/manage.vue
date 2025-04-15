@@ -166,9 +166,9 @@ const fields = ref([
     prop: 'name',
   },
   {
-    key: 'description',
-    label: 'Mô tả',
-    prop: 'description',
+    key: 'title',
+    label: 'Tiêu đề sản phẩm',
+    prop: 'title',
   },
   {
     key: 'category',
