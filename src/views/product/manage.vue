@@ -182,7 +182,7 @@ const fields = ref([
   },
   {
     key: 'viewCount',
-    label: 'Lượt xem',
+    label: 'Lượt quan tâm',
     prop: 'viewCount',
     width: 150,
     align: 'center',
