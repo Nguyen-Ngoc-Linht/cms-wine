@@ -66,6 +66,9 @@
           <template #name="{ row }">
             <span>{{ row.firstName + ' ' + row.lastName }}</span>
           </template>
+          <template #roleList="{ row }">
+            <span>{{ formatRoles(row.roleList) }}</span>
+          </template>
           <template #action="{ row }">
               <span
                 @click.stop="handleEditUser(row)"
@@ -222,6 +225,18 @@ const handleSizeChange = size => {
 const handlePageChange = page => {
   filter.page = page
   getList()
+}
+const formatRoles = (roles) => {
+  if (!roles || !Array.isArray(roles)) return ''
+
+  if (roles.includes('ROLE_ADMIN')) {
+    return 'Admin'
+  }
+
+  return roles
+    .map(role => role.replace('ROLE_', '').toLowerCase())
+    .map(role => role.charAt(0).toUpperCase() + role.slice(1))
+    .join(', ')
 }
 </script>
 

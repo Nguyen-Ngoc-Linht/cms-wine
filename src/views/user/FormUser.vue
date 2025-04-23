@@ -17,7 +17,7 @@
             </div>
           </div>
           <div class="mt-5">
-            <label class="text-lg">Bio</label>
+            <label class="text-lg">Thông tin giới thiệu</label>
             <el-input
               type="textarea"
               :rows="5"

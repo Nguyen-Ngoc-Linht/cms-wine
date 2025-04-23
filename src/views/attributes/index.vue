@@ -134,6 +134,11 @@ const fields = ref([
     prop: 'dataType',
   },
   {
+    key: 'typeSearch',
+    label: 'Tìm kiếm theo',
+    prop: 'typeSearch',
+  },
+  {
     key: 'action',
     label: 'Thao tác',
     prop: 'action',

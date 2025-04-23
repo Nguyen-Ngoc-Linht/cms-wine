@@ -147,8 +147,7 @@
             </el-tooltip>
             <span
                 v-else
-                class="text-hover"
-            >
+                class="text-hover">
               {{ row.name }}
             </span>
           </template>
@@ -160,6 +159,9 @@
           </template>
           <template #modifyTime="{ row }">
             <span>{{ formatDate(row.modifyTime) }}</span>
+          </template>
+          <template #status="{ row }">
+            <span>{{ formatStatusOrder(row.status) }}</span>
           </template>
         </TableViolation>
         <Pagination
@@ -457,6 +459,24 @@ const formatDate = dateString => {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const year = date.getFullYear()
   return `${day}/${month}/${year}`
+}
+const formatStatusOrder = (status) => {
+  switch (status) {
+    case 'SUCCESS':
+      return 'Thành công'
+    case 'FAILED':
+      return 'Không thành công'
+    case 'PENDING':
+      return 'Đang chờ xử lý'
+    case 'PROCESSING':
+      return 'Đang được xử lý'
+    case 'CANCELED':
+      return 'Đã bị hủy'
+    case 'REFUNDED':
+      return 'Đã hoàn tiền'
+    default:
+      return 'Trạng thái không xác định'
+  }
 }
 </script>
 
