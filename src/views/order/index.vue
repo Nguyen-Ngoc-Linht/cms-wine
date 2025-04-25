@@ -9,8 +9,8 @@
       >
       </el-input>
       <el-select
-          v-model="filter.eventType"
-          :placeholder="t('monitoring.errorHandling.typeEvent')"
+          v-model="filter.paymentMethod"
+          placeholder="Phương thức thanh toán"
           clearable
           filterable
           multiple
@@ -19,7 +19,7 @@
           class="w-full md:max-w-[30%] lg:max-w-[200px] short"
       >
         <el-option
-            v-for="item in listEventType"
+            v-for="item in listPaymentMethod"
             :key="item.id"
             :label="item.label"
             :value="item.value"
@@ -28,7 +28,7 @@
       </el-select>
       <el-select
           v-model="filter.status"
-          :placeholder="t('configUser.status')"
+          placeholder="Trạng thái"
           clearable
           filterable
           multiple
@@ -39,47 +39,8 @@
         <el-option
             v-for="item in listStatus"
             :key="item.value"
-            :label="item.name"
+            :label="item.label"
             :value="item.value"
-        >
-        </el-option>
-      </el-select>
-      <el-select
-          v-model="filter.routeId"
-          @change="
-          value => {
-            setListStation(value)
-          }
-        "
-          :placeholder="t('configUser.gland')"
-          clearable
-          filterable
-          collapse-tags
-          collapse-tags-tooltip
-          class="w-full md:max-w-[30%] lg:max-w-[200px] short"
-      >
-        <el-option
-            v-for="item in listRoute"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-        >
-        </el-option>
-      </el-select>
-      <el-select
-          v-model="filter.stationId"
-          :placeholder="t('configUser.station')"
-          clearable
-          filterable
-          collapse-tags
-          collapse-tags-tooltip
-          class="w-full md:max-w-[30%] lg:max-w-[200px] short"
-      >
-        <el-option
-            v-for="item in listStation"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
         >
         </el-option>
       </el-select>
@@ -99,27 +60,6 @@
           @click="searchListData()"
       >{{ t('configUser.search') }}</el-button
       >
-    </div>
-    <div
-        class="flex items-center paddingX-24 mt-4"
-    >
-      <el-button
-          text
-          size="default"
-          class="!p-0"
-          @click="handleAddEvent()"
-      >
-        <div
-            class="flex items-center pointer text-[#525B73]"
-            style="line-height: 20px"
-        >
-          <svg-icon
-              icon-class="el-icon-plus"
-              class="width-20 height-20 margin-right-4"
-          />
-          {{ t('monitoring.errorHandling.addEvent') }}
-        </div>
-      </el-button>
     </div>
     <hr class="margin-bottom-12 mt-2" />
     <div class="paddingX-24 mb-4">
@@ -162,6 +102,9 @@
           </template>
           <template #status="{ row }">
             <span>{{ formatStatusOrder(row.status) }}</span>
+          </template>
+          <template #createdBy="{ row }">
+            <span>{{ row.createdBy }}</span>
           </template>
         </TableViolation>
         <Pagination
@@ -248,7 +191,7 @@ import Dialog from '@/components/Dialog/index.vue'
 import { cloneDeep } from 'lodash-unified'
 import { useRouter } from 'vue-router'
 import { useI18n } from '@/locale'
-import { ElMessage } from 'element-plus'
+import {dayjs, ElMessage} from 'element-plus'
 import {apiGetAllOrder} from '@/api/order'
 import { formatNumber } from '@/utils'
 
@@ -260,9 +203,7 @@ const defaultFilter = {
   size: 10,
   status: [],
   keyword: '',
-  routeId: '',
-  stationId: '',
-  eventType: [],
+  paymentMethod: [],
   time: [],
   total: 0,
 }
@@ -276,11 +217,14 @@ const fields = ref([
     key: 'id',
     label: t('order.id'),
     prop: 'id',
+    width: 70,
+    align: 'center',
   },
   {
-    key: 'userId',
+    key: 'createdBy',
     label: t('order.userId'),
-    prop: 'userId',
+    prop: 'createdBy',
+    align: 'center',
   },
   {
     key: 'totalAmount',
@@ -302,63 +246,68 @@ const fields = ref([
     label: t('order.paymentMethod'),
     prop: 'paymentMethod',
     // width: 120,
+    align: 'center',
   },
   {
     key: 'createTime',
     label: t('order.createTime'),
     prop: 'createTime',
     // width: 120,
+    align: 'center',
   },
 ])
 const listLoading = ref(false)
 const list = ref([])
-const listRoute = ref([])
 const listStation = ref([])
 const listStatus = ref([
   {
-    key: 0,
-    name: t('configUser.open'),
-    value: 0,
-  },
-  {
-    key: 1,
-    name: t('configUser.processing'),
-    value: 1,
-  },
-  {
-    key: 2,
-    name: t('configUser.processes'),
-    value: 2,
-  },
-  {
-    key: 3,
-    name: t('configUser.closed'),
-    value: 3,
-  },
-])
-const listEventType = ref([
-  {
-    id: 0,
-    label: t('monitoring.errorHandling.maintenancePlan'),
-    value: 0,
-  },
-  {
     id: 1,
-    label: t('monitoring.errorHandling.periodicInspectionAndAcceptancePlan'),
-    value: 1,
+    label: 'Đơn hàng được xử lý thành công',
+    value: 'SUCCESS',
   },
   {
     id: 2,
-    label: t('monitoring.errorHandling.monitoringAndEvaluationPlan'),
-    value: 2,
+    label: 'Đơn hàng không thành công',
+    value: 'FAILED',
   },
   {
     id: 3,
-    label: t('monitoring.errorHandling.reportProblem'),
-    value: 3,
+    label: 'Đơn hàng đang được xử lý',
+    value: 'PROCESSING',
+  },
+  {
+    id: 4,
+    label: 'Đơn hàng bị hủy',
+    value: 'CANCELED',
+  },
+  // {
+  //   id: 5,
+  //   label: 'Đơn hàng đã được hoàn tiền',
+  //   value: 'REFUNDED',
+  // },
+])
+const listPaymentMethod = ref([
+  {
+    id: 1,
+    label: 'Thanh toán VNPAY',
+    value: 'VNPAY',
+  },
+  {
+    id: 1,
+    label: 'Thanh toán MOMO',
+    value: 'MOMO',
+  },
+  {
+    id: 3,
+    label: 'Quét mã QRCODE',
+    value: 'QRCODE',
+  },
+  {
+    id: 4,
+    label: 'Tiền mặt',
+    value: 'CASH',
   },
 ])
-const listEvent = ref([])
 const infoEvent = ref({})
 
 onMounted(() => {
@@ -368,8 +317,15 @@ onMounted(() => {
 
 const getList = async () => {
   listLoading.value = true
+  const fromDate = filter.time?.[0] || null
+  const toDate = filter.time?.[1] || null
   const params = {
     paged: {
+      keyword: filter.keyword,
+      paymentMethod: filter.paymentMethod,
+      status: filter.status,
+      from: fromDate ? dayjs(fromDate).format('YYYY-MM-DD') : null,
+      to: toDate ? dayjs(toDate).format('YYYY-MM-DD') : null,
       page: filter.page,
       size: filter.size
     }
@@ -383,12 +339,6 @@ const getList = async () => {
 }
 const setDataDefault = async () => {
 }
-const handleAddEvent = () => {
-}
-const handleEditEvent = data => {
-}
-const handleUpdateProcessEvent = data => {
-}
 const handleViewEvent = data => {
 }
 const handleDeleteEvent = async () => {
@@ -396,6 +346,7 @@ const handleDeleteEvent = async () => {
 const handleCloseEvent = async () => {
 }
 const searchListData = () => {
+  console.log('hehe')
   getList()
 }
 const setListStation = async routeId => {
