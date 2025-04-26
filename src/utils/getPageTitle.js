@@ -1,6 +1,6 @@
 import defaultSettings from '@/settings'
 import i18n from '@/locale'
-const title = defaultSettings.title || 'GSTP - Giám sát thu phí'
+const title = defaultSettings.title || 'CMS - WINE'
 
 export default function getPageTitle(pageTitle) {
   if (pageTitle) {

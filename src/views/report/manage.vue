@@ -149,12 +149,7 @@
           style="text-align: center"
           class="mt-3"
         >
-          <iframe
-            v-if="pdfUrl"
-            :src="pdfUrl"
-            width="100%"
-            style="height: calc(100vh - 100px)"
-          ></iframe>
+          <pdf-embed :source="pdfUrl" style="width: 100%; height: calc(100vh - 100px)" />
         </div>
       </div>
     </div>
@@ -162,6 +157,7 @@
 </template>
 
 <script setup>
+import PdfEmbed from 'vue-pdf-embed'
 import { onMounted, ref } from 'vue'
 import { useI18n } from '@/locale'
 import { apiExportReport } from '@/api/report'

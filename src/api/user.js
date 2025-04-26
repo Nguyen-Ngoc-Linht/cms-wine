@@ -59,16 +59,39 @@ export function apiEditUser(id, data) {
   })
 }
 
-export function apiDeleteUser(id) {
-  return httpBff.request({
-    url: '/system/user/' + id,
-    method: 'delete',
-  })
-}
-
 export function getUserList(data) {
   return http.request({
     url: '/user-service/api/v1.0/users/find-all',
+    method: 'post',
+    data,
+  })
+}
+
+export function updateUser(data, id) {
+  return http.request({
+    url: '/user-service/api/v1.0/users/' + id,
+    method: 'put',
+    data,
+  })
+}
+
+export function apiLockUser(id) {
+  return http.request({
+    url: '/user-service/api/v1.0/users/' + id + '/lock',
+    method: 'put',
+  })
+}
+
+export function apiUnlockUser(id) {
+  return http.request({
+    url: '/user-service/api/v1.0/users/' + id + '/unlock',
+    method: 'put',
+  })
+}
+
+export function apiPasswordRecovery(data) {
+  return http.request({
+    url: '/user-service/api/v1.0/users/password-recovery',
     method: 'post',
     data,
   })
@@ -155,6 +178,7 @@ export function updatePass(data) {
     data,
   })
 }
+
 export function checkAccountChangePass(data) {
   return http.request({
     url: '/user/check-password-reminder',
