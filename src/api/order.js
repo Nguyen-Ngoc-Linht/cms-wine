@@ -7,3 +7,11 @@ export function apiGetAllOrder(data) {
     data,
   })
 }
+
+export function apiChangeStatusOrder(data) {
+  return http.request({
+    method: 'post',
+    url: '/wine-service/api/v1.0/managements/orders/change-status',
+    data,
+  })
+}
