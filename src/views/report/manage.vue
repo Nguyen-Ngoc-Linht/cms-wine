@@ -127,13 +127,34 @@
           </el-row>
           <div class="flex justify-end mt-2">
             <el-button
-              v-if="showDownload"
-              @click.stop="handleExport()"
-              download="bao_cao.pdf"
-              type="success"
-              class="ml-2"
+                v-if="showDownload"
+                @click.stop="handleExport('EXCEL')"
+                download="bao_cao.xlsx"
+                type="success"
+                plain
+                class="ml-2 flex items-center"
             >
-              Tải xuống
+              <svg-icon
+                  icon-class="excel-premium"
+                  class="mr-2 text-green-500"
+                  style="width: 20px; height: 20px;"
+              />
+              <span class="text-green-600 font-semibold">Excel</span>
+            </el-button>
+            <el-button
+                v-if="showDownload"
+                @click.stop="handleExport('PDF')"
+                download="bao_cao.pdf"
+                type="danger"
+                plain
+                class="ml-2 flex items-center"
+            >
+              <svg-icon
+                  icon-class="pdf-premium"
+                  class="mr-2 text-red-600"
+                  style="width: 20px; height: 20px;"
+              />
+              <span class="text-red-600 font-semibold">PDF</span>
             </el-button>
             <el-button
               :loading="processingPreview"
@@ -256,9 +277,14 @@ const showPdf = async () => {
   }
 
   let base64 = null
-  const rs = await apiExportReport(payload)
-  if (rs.code === 200) {
-    base64 = rs.data.data
+  try {
+    const rs = await apiExportReport(payload)
+    if (rs.code === 200) {
+      base64 = rs.data.data
+    }
+  } catch (e) {
+    console.log('error', e)
+    return
   }
 
   console.log('Payload gửi về backend:', payload)
@@ -329,18 +355,23 @@ const buildReportPayload = (type) => {
     }
   }
 
-  console.error('Không xác định loại báo cáo.')
+  ElMessage({
+    type: 'warning',
+    message: 'Không xác định loại báo cáo.',
+  })
   return null
 }
 
-const handleExport = async () => {
+const handleExport = async (type) => {
   try {
-    const params = buildReportPayload('EXCEL')
+    const params = buildReportPayload(type)
     const rs = await apiExportReport(params)
     if (rs.code === 200) {
       const base64Data = rs.data.data
-      const typeDownload = 'application/excel'
-      const fileExtension = 'xlsx'
+      let typeDownload = 'application/pdf'
+      if (type === 'EXCEL') {
+        typeDownload = 'application/excel'
+      }
 
       const blob = base64ToBlob(base64Data, typeDownload)
       const url = URL.createObjectURL(blob)
