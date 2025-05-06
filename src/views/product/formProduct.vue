@@ -492,6 +492,7 @@ const convertDataProduct = (productData) => {
       url: baseUrl.value + 'media-service/api/v1.0/images' + image.url.replace(/^\.\/uploads/, '/uploads')
     })
   })
+  console.log(JSON.parse(infoProduct.value.description), 'mo ta day')
   infoProduct.value.description = JSON.parse(infoProduct.value.description)
 }
 // Thuộc tính và biến thể

@@ -125,11 +125,16 @@ watch(
   { immediate: true }
 )
 
-// Gửi ngược dữ liệu mô tả khi thay đổi
+let lastDescription = JSON.stringify([])
+
 watch(
   arrDescription,
   (val) => {
-    emit('update:description', val)
+    const newDesc = JSON.stringify(val)
+    if (newDesc !== lastDescription) {
+      emit('update:description', val)
+      lastDescription = newDesc
+    }
   },
   { deep: true }
 )
