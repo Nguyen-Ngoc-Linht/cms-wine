@@ -42,7 +42,7 @@ const getBreadcrumb = () => {
   let matched = route.matched.filter(item => item.meta && item.meta.title && !item.meta.root)
   const first = matched[0]
   if (!isDashboard(first)) {
-    matched = [{ path: '/', meta: { title: 'GSTP - Giám sát thu phí' } }].concat(matched)
+    matched = [{ path: '/', meta: { title: 'CMS - WINE' } }].concat(matched)
   }
   levelList.value = matched.filter(
     item => item.meta && item.meta.title && item.meta.breadcrumb !== false

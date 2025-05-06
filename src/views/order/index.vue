@@ -2,152 +2,92 @@
   <div>
     <div class="flex flex-wrap gap-px-8 items-center justify-start paddingX-24 mt-5">
       <el-input
-          v-model="filter.keyword"
-          @keyup.enter="getList()"
-          :placeholder="t('el.transfer.filterPlaceholder')"
-          class="w-full md:max-w-[30%] lg:max-w-[200px] short"
+        v-model="filter.keyword"
+        @keyup.enter="getList()"
+        :placeholder="t('el.transfer.filterPlaceholder')"
+        class="w-full md:max-w-[30%] lg:max-w-[200px] short"
       >
       </el-input>
       <el-select
-          v-model="filter.eventType"
-          :placeholder="t('monitoring.errorHandling.typeEvent')"
-          clearable
-          filterable
-          multiple
-          collapse-tags
-          collapse-tags-tooltip
-          class="w-full md:max-w-[30%] lg:max-w-[200px] short"
+        v-model="filter.paymentMethod"
+        placeholder="Phương thức thanh toán"
+        clearable
+        filterable
+        multiple
+        collapse-tags
+        collapse-tags-tooltip
+        class="w-full md:max-w-[30%] lg:max-w-[200px] short"
       >
         <el-option
-            v-for="item in listEventType"
-            :key="item.id"
-            :label="item.label"
-            :value="item.value"
+          v-for="item in listPaymentMethod"
+          :key="item.id"
+          :label="item.label"
+          :value="item.value"
         >
         </el-option>
       </el-select>
       <el-select
-          v-model="filter.status"
-          :placeholder="t('configUser.status')"
-          clearable
-          filterable
-          multiple
-          collapse-tags
-          collapse-tags-tooltip
-          class="w-full md:max-w-[30%] lg:max-w-[200px] short"
+        v-model="filter.status"
+        placeholder="Trạng thái"
+        clearable
+        filterable
+        multiple
+        collapse-tags
+        collapse-tags-tooltip
+        class="w-full md:max-w-[30%] lg:max-w-[200px] short"
       >
         <el-option
-            v-for="item in listStatus"
-            :key="item.value"
-            :label="item.name"
-            :value="item.value"
-        >
-        </el-option>
-      </el-select>
-      <el-select
-          v-model="filter.routeId"
-          @change="
-          value => {
-            setListStation(value)
-          }
-        "
-          :placeholder="t('configUser.gland')"
-          clearable
-          filterable
-          collapse-tags
-          collapse-tags-tooltip
-          class="w-full md:max-w-[30%] lg:max-w-[200px] short"
-      >
-        <el-option
-            v-for="item in listRoute"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-        >
-        </el-option>
-      </el-select>
-      <el-select
-          v-model="filter.stationId"
-          :placeholder="t('configUser.station')"
-          clearable
-          filterable
-          collapse-tags
-          collapse-tags-tooltip
-          class="w-full md:max-w-[30%] lg:max-w-[200px] short"
-      >
-        <el-option
-            v-for="item in listStation"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
+          v-for="item in listStatus"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
         >
         </el-option>
       </el-select>
       <el-date-picker
-          v-model="filter.time"
-          type="daterange"
-          :start-placeholder="t('el.datepicker.startTime')"
-          :range-separator="t('el.datepicker.to')"
-          :end-placeholder="t('el.datepicker.endTime')"
-          clearable
-          value-format="YYYY-MM-DD HH:mm:ss"
-          format="DD/MM/YYYY"
-          class="w-full md:max-w-[30%] lg:max-w-[360px] flex-grow-0"
+        v-model="filter.time"
+        type="daterange"
+        :start-placeholder="t('el.datepicker.startTime')"
+        :range-separator="t('el.datepicker.to')"
+        :end-placeholder="t('el.datepicker.endTime')"
+        clearable
+        value-format="YYYY-MM-DD HH:mm:ss"
+        format="DD/MM/YYYY"
+        class="w-full md:max-w-[30%] lg:max-w-[360px] flex-grow-0"
       />
       <el-button
-          class="el-button--main"
-          @click="searchListData()"
-      >{{ t('configUser.search') }}</el-button
-      >
-    </div>
-    <div
-        class="flex items-center paddingX-24 mt-4"
-    >
-      <el-button
-          text
-          size="default"
-          class="!p-0"
-          @click="handleAddEvent()"
-      >
-        <div
-            class="flex items-center pointer text-[#525B73]"
-            style="line-height: 20px"
-        >
-          <svg-icon
-              icon-class="el-icon-plus"
-              class="width-20 height-20 margin-right-4"
-          />
-          {{ t('monitoring.errorHandling.addEvent') }}
-        </div>
+        class="el-button--main"
+        @click="searchListData()"
+        >{{ t('configUser.search') }}
       </el-button>
     </div>
     <hr class="margin-bottom-12 mt-2" />
     <div class="paddingX-24 mb-4">
       <div class="px-3 py-3 bg-white">
         <TableViolation
-            :listLoading="listLoading"
-            :fields="fields"
-            :STT="true"
-            :data="list"
-            :page="filter.page"
-            :size="filter.size"
-            @show-view="handleViewEvent"
+          :listLoading="listLoading"
+          :fields="fields"
+          :STT="true"
+          :data="list"
+          :page="filter.page"
+          :size="filter.size"
+          @show-view="handleViewEvent"
         >
           <template #name="{ row }">
             <el-tooltip
-                v-if="row.name.length > 100"
-                :content="row.name"
-                placement="bottom"
-                effect="light"
-                popper-class="custom-tooltip"
+              v-if="row.name.length > 100"
+              :content="row.name"
+              placement="bottom"
+              effect="light"
+              popper-class="custom-tooltip"
             >
               <span class="text-hover">
                 {{ row.name.length > 100 ? row.name.slice(0, 100) + '...' : row.name }}
               </span>
             </el-tooltip>
             <span
-                v-else
-                class="text-hover"
+              v-else
+              class="text-hover"
             >
               {{ row.name }}
             </span>
@@ -161,50 +101,70 @@
           <template #modifyTime="{ row }">
             <span>{{ formatDate(row.modifyTime) }}</span>
           </template>
+          <template #status="{ row }">
+            <span>{{ formatStatusOrder(row.status) }}</span>
+          </template>
+          <template #createdBy="{ row }">
+            <span>{{ row.createdBy }}</span>
+          </template>
+          <template #action="{ row }">
+            <div v-if="row.status === 'PROCESSING'">
+              <span
+                @click="handleSuccessOrder(row)"
+                class="delete-member pointer ms-2 me-3"
+              >
+                <svg-icon
+                  style="width: 24px; height: 24px"
+                  icon-class="true-active"
+                  class="mr-2"
+                />
+              </span>
+            </div>
+          </template>
         </TableViolation>
         <Pagination
-            class="margin-top-12"
-            v-model:page.sync="filter.page"
-            v-model:size.sync="filter.size"
-            :total="filter.total"
-            @size-change="handleSizeChange"
-            @current-change="handlePageChange"
+          class="margin-top-12"
+          v-model:page.sync="filter.page"
+          v-model:size.sync="filter.size"
+          :total="filter.total"
+          @size-change="handleSizeChange"
+          @current-change="handlePageChange"
         />
       </div>
     </div>
 
     <Dialog
-        :show="showDialog"
-        :appendToBody="true"
-        :width="'682'"
-        :title="titleDialog"
-        @closeDialog="handleCloseDialog"
+      :show="showDialog"
+      :appendToBody="true"
+      :width="'682'"
+      :title="titleDialog"
+      @closeDialog="handleCloseDialog"
     >
       <template v-slot:content>
         <SendEvent
-            @closeUpdate="handleCloseDialog"
-            :eventInfo="infoEvent"
+          @closeUpdate="handleCloseDialog"
+          :eventInfo="infoEvent"
         ></SendEvent>
       </template>
     </Dialog>
     <el-dialog
-        v-model="showDialogDelete"
-        :title="$t('monitoring.errorHandling.deleteEvent')"
-        width="500"
-        align-center
+      v-model="showDialogDelete"
+      :title="$t('monitoring.errorHandling.deleteEvent')"
+      width="500"
+      align-center
     >
       <span>{{ $t('monitoring.errorHandling.confirmDeleteEvent') }}</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button
-              class="bg-outline-secondary"
-              @click="showDialogDelete = false"
+            class="bg-outline-secondary"
+            @click="showDialogDelete = false"
           >
             {{ $t('configUser.cancel') }}
           </el-button>
           <el-button
-              class="el-button--main"
-              @click="handleDeleteEvent()"
+            class="el-button--main"
+            @click="handleDeleteEvent()"
           >
             {{ $t('el.datepicker.confirm') }}
           </el-button>
@@ -212,23 +172,23 @@
       </template>
     </el-dialog>
     <el-dialog
-        v-model="showDialogClose"
-        :title="$t('monitoring.errorHandling.closeEvent')"
-        width="500"
-        align-center
+      v-model="showDialogClose"
+      :title="$t('monitoring.errorHandling.closeEvent')"
+      width="500"
+      align-center
     >
       <span>{{ $t('monitoring.errorHandling.confirmCloseEvent') }}</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button
-              class="bg-outline-secondary"
-              @click="showDialogClose = false"
+            class="bg-outline-secondary"
+            @click="showDialogClose = false"
           >
             {{ $t('configUser.cancel') }}
           </el-button>
           <el-button
-              class="el-button--main"
-              @click="handleCloseEvent()"
+            class="el-button--main"
+            @click="handleCloseEvent()"
           >
             {{ $t('configUser.closed') }}
           </el-button>
@@ -244,23 +204,19 @@ import Pagination from '@/components/Pagination/index.vue'
 import TableViolation from '@/components/Table/index.vue'
 import Dialog from '@/components/Dialog/index.vue'
 import { cloneDeep } from 'lodash-unified'
-import { useRouter } from 'vue-router'
 import { useI18n } from '@/locale'
-import { ElMessage } from 'element-plus'
-import {apiGetAllOrder} from '@/api/order'
+import {dayjs, ElMessage, ElMessageBox} from 'element-plus'
+import {apiChangeStatusOrder, apiGetAllOrder} from '@/api/order'
 import { formatNumber } from '@/utils'
 
 const { t } = useI18n()
-const router = useRouter()
 
 const defaultFilter = {
   page: 1,
-  size: 10,
+  size: 20,
   status: [],
   keyword: '',
-  routeId: '',
-  stationId: '',
-  eventType: [],
+  paymentMethod: [],
   time: [],
   total: 0,
 }
@@ -272,105 +228,123 @@ const titleDialog = ref(t('monitoring.errorHandling.sendEvent'))
 const fields = ref([
   {
     key: 'id',
-    label: t('order.id'),
+    label: 'ID',
     prop: 'id',
+    width: 70,
+    align: 'center',
   },
   {
-    key: 'userId',
-    label: t('order.userId'),
-    prop: 'userId',
+    key: 'createdBy',
+    label: 'Người đặt',
+    prop: 'createdBy',
+    width: 250,
   },
   {
     key: 'totalAmount',
-    label: t('order.totalAmount'),
+    label: 'Tổng tiền',
     prop: 'totalAmount',
   },
   {
     key: 'note',
-    label: t('order.note'),
+    label: 'Ghi chú',
     prop: 'note',
   },
   {
     key: 'status',
-    label: t('order.status'),
+    label: 'Trạng thái',
     prop: 'status',
   },
   {
     key: 'paymentMethod',
-    label: t('order.paymentMethod'),
+    label: 'Phương thức',
     prop: 'paymentMethod',
     // width: 120,
+    align: 'center',
   },
   {
     key: 'createTime',
-    label: t('order.createTime'),
+    label: 'Ngày tạo',
     prop: 'createTime',
-    // width: 120,
+    align: 'center',
+  },
+  {
+    key: 'action',
+    label: 'Thao tác',
+    prop: 'action',
+    align: 'center',
   },
 ])
 const listLoading = ref(false)
 const list = ref([])
-const listRoute = ref([])
-const listStation = ref([])
 const listStatus = ref([
   {
-    key: 0,
-    name: t('configUser.open'),
-    value: 0,
-  },
-  {
-    key: 1,
-    name: t('configUser.processing'),
-    value: 1,
-  },
-  {
-    key: 2,
-    name: t('configUser.processes'),
-    value: 2,
-  },
-  {
-    key: 3,
-    name: t('configUser.closed'),
-    value: 3,
-  },
-])
-const listEventType = ref([
-  {
-    id: 0,
-    label: t('monitoring.errorHandling.maintenancePlan'),
-    value: 0,
-  },
-  {
     id: 1,
-    label: t('monitoring.errorHandling.periodicInspectionAndAcceptancePlan'),
-    value: 1,
+    label: 'Đơn hàng được xử lý thành công',
+    value: 'SUCCESS',
   },
   {
     id: 2,
-    label: t('monitoring.errorHandling.monitoringAndEvaluationPlan'),
-    value: 2,
+    label: 'Đơn hàng không thành công',
+    value: 'FAILED',
   },
   {
     id: 3,
-    label: t('monitoring.errorHandling.reportProblem'),
-    value: 3,
+    label: 'Đơn hàng đang được xử lý',
+    value: 'PROCESSING',
+  },
+  {
+    id: 4,
+    label: 'Đơn hàng bị hủy',
+    value: 'CANCELED',
+  },
+  // {
+  //   id: 5,
+  //   label: 'Đơn hàng đã được hoàn tiền',
+  //   value: 'REFUNDED',
+  // },
+])
+const listPaymentMethod = ref([
+  {
+    id: 1,
+    label: 'Thanh toán VNPAY',
+    value: 'VNPAY',
+  },
+  {
+    id: 1,
+    label: 'Thanh toán MOMO',
+    value: 'MOMO',
+  },
+  {
+    id: 3,
+    label: 'Quét mã QRCODE',
+    value: 'QRCODE',
+  },
+  {
+    id: 4,
+    label: 'Tiền mặt',
+    value: 'CASH',
   },
 ])
-const listEvent = ref([])
 const infoEvent = ref({})
 
 onMounted(() => {
-  setDataDefault()
   getList()
 })
 
 const getList = async () => {
   listLoading.value = true
+  const fromDate = filter.time?.[0] || null
+  const toDate = filter.time?.[1] || null
   const params = {
+    keyword: filter.keyword,
+    paymentMethod: filter.paymentMethod,
+    status: filter.status,
+    fromDate: fromDate ? dayjs(fromDate).format('YYYY-MM-DD') : null,
+    toDate: toDate ? dayjs(toDate).format('YYYY-MM-DD') : null,
     paged: {
       page: filter.page,
-      size: filter.size
-    }
+      size: filter.size,
+    },
   }
   const rs = await apiGetAllOrder(params)
   if (rs.code === 200) {
@@ -379,38 +353,11 @@ const getList = async () => {
   }
   listLoading.value = false
 }
-const setDataDefault = async () => {
-}
-const handleAddEvent = () => {
-}
-const handleEditEvent = data => {
-}
-const handleUpdateProcessEvent = data => {
-}
-const handleViewEvent = data => {
-}
-const handleDeleteEvent = async () => {
-}
-const handleCloseEvent = async () => {
-}
+const handleViewEvent = data => {}
+const handleDeleteEvent = async () => {}
+const handleCloseEvent = async () => {}
 const searchListData = () => {
   getList()
-}
-const setListStation = async routeId => {
-  listStation.value = []
-  filter.stationId = ''
-  const params = {
-    page: 1,
-    size: 20,
-    keyword: '',
-    routeIds: [routeId],
-    stationIds: [],
-    unitIds: [],
-  }
-  // const listStationUser = routeUser.GET_STATIONS(routeId)
-  // if (listStationUser.length > 0) {
-  //   params.stationIds = listStationUser
-  // }
 }
 const handleSizeChange = size => {
   filter.size = size
@@ -437,26 +384,57 @@ const handleCloseDialog = () => {
   showDialog.value = false
   getList()
 }
-const setTypeError = type => {
-  switch (type) {
-    case 0:
-      return t('monitoring.errorHandling.maintenancePlan')
-    case 1:
-      return t('monitoring.errorHandling.periodicInspectionAndAcceptancePlan')
-    case 2:
-      return t('monitoring.errorHandling.monitoringAndEvaluationPlan')
-    case 3:
-      return t('monitoring.errorHandling.reportProblem')
-    default:
-      return ''
-  }
-}
 const formatDate = dateString => {
   const date = new Date(dateString)
   const day = String(date.getDate()).padStart(2, '0')
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const year = date.getFullYear()
   return `${day}/${month}/${year}`
+}
+const formatStatusOrder = status => {
+  switch (status) {
+    case 'SUCCESS':
+      return 'Thành công'
+    case 'FAILED':
+      return 'Không thành công'
+    case 'PENDING':
+      return 'Đang chờ xử lý'
+    case 'PROCESSING':
+      return 'Đang được xử lý'
+    case 'CANCELED':
+      return 'Đã bị hủy'
+    case 'REFUNDED':
+      return 'Đã hoàn tiền'
+    default:
+      return 'Trạng thái không xác định'
+  }
+}
+const handleSuccessOrder = data => {
+  ElMessageBox.confirm('Xác nhận hàng đã giao đến người dùng', 'Cảnh báo', {
+    confirmButtonText: 'Xác nhận',
+    cancelButtonText: 'Hủy',
+    confirmButtonClass: 'el-button--main',
+    cancelButtonClass: 'el-button--secondary',
+    buttonSize: 'default',
+  })
+    .then(() => {
+      successOrder(data.id)
+    })
+    .catch(() => {})
+}
+const successOrder = async (id) => {
+  const params = {
+    id,
+    status: 'SUCCESS',
+  }
+  const rs = await apiChangeStatusOrder(params)
+  if (rs.code === 200) {
+    await getList()
+    ElMessage({
+      type: 'success',
+      message: 'Xác nhận đơn hàng có mã: ' + id + ' đã được giao thành công',
+    })
+  }
 }
 </script>
 

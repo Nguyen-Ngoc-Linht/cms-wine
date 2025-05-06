@@ -1,5 +1,5 @@
 const defaultSetting = {
-  title: 'GSTP - Giám sát thu phí',
+  title: 'CMS - WINE',
   showSettings: false,
   tagsView: false,
   fixedHeader: true,
@@ -12,7 +12,7 @@ export const LIST_DIRECTION_CONFIG = [
   },
   {
     name: 'TT',
-    value: 'TT',
+    value: 'TT'
   },
 ]
 export const LIST_APP_CONFIG = [

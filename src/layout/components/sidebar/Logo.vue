@@ -39,7 +39,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const title = ref('GSTP')
+const title = ref('CMS WINE')
 
 const props = defineProps({
   collapse: {
