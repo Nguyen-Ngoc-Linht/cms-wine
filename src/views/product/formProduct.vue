@@ -469,6 +469,7 @@ const formatValidValueUpdate = () => {
 
   return {
     name: infoProduct.value.name,
+    title: infoProduct.value.title,
     description: JSON.stringify(infoProduct.value.description),
     categoryId: infoProduct.value.category.id,
     attributes: attributesProductLst,
