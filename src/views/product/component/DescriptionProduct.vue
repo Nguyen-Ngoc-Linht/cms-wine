@@ -208,6 +208,6 @@ const deleteType = (index) => {
 
 .main-block {
   color: #95a0c5;
-  font-style: 14px;
+  font-size: 14px;
 }
 </style>

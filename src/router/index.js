@@ -9,6 +9,7 @@ import order from './modules/order'
 import setting from './modules/setting'
 import report from './modules/report'
 import inventory from '@/router/modules/inventory'
+import communication from './modules/communication'
 
 export const constantRoutes = [
   {
@@ -93,6 +94,7 @@ export const asyncRoutes = [
   order,
   user,
   report,
+  communication,
   setting,
   {
     path: '/:pathMatch(.*)*',

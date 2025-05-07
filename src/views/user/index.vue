@@ -46,26 +46,6 @@
         >{{ t('configUser.search') }}
       </el-button>
     </div>
-    <!--    <div class="flex items-center justify-between paddingX-24 mt-3">-->
-    <!--      <div class="flex gap-px-8 items-center">-->
-    <!--        <el-button-->
-    <!--          text-->
-    <!--          size="default"-->
-    <!--          class="!p-0"-->
-    <!--        >-->
-    <!--          <div-->
-    <!--            class="flex items-center pointer text-[#525B73]"-->
-    <!--            style="line-height: 20px"-->
-    <!--          >-->
-    <!--            <svg-icon-->
-    <!--              icon-class="el-icon-plus"-->
-    <!--              class="width-20 height-20 margin-right-4"-->
-    <!--            />-->
-    <!--            Thêm tài khoản-->
-    <!--          </div>-->
-    <!--        </el-button>-->
-    <!--      </div>-->
-    <!--    </div>-->
     <hr class="margin-bottom-12 mt-2" />
     <!--  Table  -->
     <div class="paddingX-24 mt-3">
