@@ -26,7 +26,7 @@ export default defineConfig(({ command, mode }) => {
 
     server: {
       host: '0.0.0.0',
-      port: VITE_PORT || 3600,
+      port: VITE_PORT || 3900,
       https: false,
       open: false,
       proxy: {
