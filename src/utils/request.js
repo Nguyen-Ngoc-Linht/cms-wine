@@ -136,7 +136,7 @@ export class HttpRequest {
         if (type === '[object Blob]' || type === '[object ArrayBuffer]') {
           return result
         } else {
-          const { code, message } = result
+          const { code, message, data } = result
           const isErrorToken = LOGIN_ERROR_CODE.find(item => item.code == code)
           const isWhiteCode = WHITE_CODE_LIST.find(item => item.code == code)
 
@@ -147,11 +147,11 @@ export class HttpRequest {
             window.location.reload()
           } else if (!isWhiteCode) {
             ElMessage({
-              message: message || 'Error',
+              message: data || 'Error',
               type: 'error',
               duration: 3 * 1000,
             })
-            return Promise.reject(new Error(message || 'Error'))
+            return Promise.reject(new Error(data || 'Error'))
           } else {
             return result
           }
