@@ -11,7 +11,7 @@ export default {
     {
       path: '',
       name: 'home',
-      component: () => import('@/views/index.vue'),
+      component: () => import('@/views/dashboard/index.vue'),
       meta: {
         title: 'home',
       },
