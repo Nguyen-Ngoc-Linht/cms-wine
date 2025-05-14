@@ -71,6 +71,10 @@ const props = defineProps({
   fields: Array,
   page: Number,
   size: Number,
+  height: {
+    type: Number,
+    default: 270,
+  },
 })
 
 const selectTable = ({ row }) => {
@@ -94,7 +98,7 @@ const tableRowClassName = ({ row }) => {
 
 const maxHeight = computed(() => {
   const viewportHeight = window.innerHeight
-  return viewportHeight - 270
+  return viewportHeight - props.height
 })
 </script>
 

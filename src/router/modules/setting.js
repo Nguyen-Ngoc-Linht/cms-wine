@@ -32,6 +32,16 @@ export default {
       },
     },
     {
+      path: 'chatbot-setting',
+      name: 'chatbot-setting',
+      component: () => import('@/views/chatbot/manage.vue'),
+      meta: {
+        title: 'Cài đặt dữ liệu chatbot',
+        noCache: true,
+        permissions: [''],
+      },
+    },
+    {
       path: 'attributes',
       name: 'product-attributes1',
       component: () => import('@/views/attributes/index.vue'),
