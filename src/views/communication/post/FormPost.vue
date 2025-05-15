@@ -2,12 +2,33 @@
   <div>
     <div class="w-full bg-white flex items-center justify-between px-4 py-3">
       <h5 class="flex items-center">
-        <div class="back pointer" @click="backPostManage()">
-          <img src="@/assets/imgs/weightStation/back.png" alt="..."/>
+        <div
+          class="back pointer"
+          @click="backPostManage()"
+        >
+          <img
+            src="@/assets/imgs/weightStation/back.png"
+            alt="..."
+          />
         </div>
-        <div v-if="isCreate" class="ms-2 text-2xl font-bold">Thêm bài viết</div>
-        <div v-if="isEdit" class="ms-2 text-2xl font-bold">Sửa bài viết</div>
-        <div v-if="isView" class="ms-2 text-2xl font-bold">Thông tin bài viết</div>
+        <div
+          v-if="isCreate"
+          class="ms-2 text-2xl font-bold"
+        >
+          Thêm bài viết
+        </div>
+        <div
+          v-if="isEdit"
+          class="ms-2 text-2xl font-bold"
+        >
+          Sửa bài viết
+        </div>
+        <div
+          v-if="isView"
+          class="ms-2 text-2xl font-bold"
+        >
+          Thông tin bài viết
+        </div>
       </h5>
       <div class="flex items-center">
         <el-button
@@ -15,7 +36,7 @@
           :loading="processing"
           @click="handleCreate()"
           class="el-button--main"
-        >{{ $t('omsSetting.save') }}
+          >{{ $t('omsSetting.save') }}
         </el-button>
         <el-button
           :loading="processing"
@@ -30,31 +51,36 @@
 
     <div class="px-6 my-4 content-page">
       <div class="bg-white px-5 pt-6 pb-4">
-        <el-form ref="formPost" :rules="ruleEdit" :model="infoPost">
+        <el-form
+          ref="formPost"
+          :rules="ruleEdit"
+          :model="infoPost"
+        >
           <div class="flex items-center justify-between">
-            <h5 class="text-black font-semibold text-lg">
-              Thông tin bài viết
-            </h5>
+            <h5 class="text-black font-semibold text-lg">Thông tin bài viết</h5>
           </div>
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item
                 label="Tiêu đề bài viết"
-                prop="name"
+                prop="title"
                 class="custom mb-2"
                 style="display: inline-block; width: 100%"
               >
                 <el-input
-                  v-model="infoPost.name"
+                  v-model="infoPost.title"
                   maxlength="250"
                   :placeholder="t('configUser.pleaseEnter')"
                 />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item prop="typePost.id" label="Loại bài viết">
+              <el-form-item
+                prop="type"
+                label="Loại bài viết"
+              >
                 <el-select
-                  v-model="infoPost.typePost.id"
+                  v-model="infoPost.type"
                   clearable
                   collapse-tags
                   style="width: 100%"
@@ -101,7 +127,8 @@
                           <span
                             @click="deleteType(index)"
                             class="cursor-pointer bg-outline-danger text--danger rounded-sm px-2"
-                          >Xóa</span>
+                            >Xóa</span
+                          >
                         </div>
 
                         <template v-if="item.type === 'text' || item.type === 'tag'">
@@ -113,7 +140,11 @@
                         </template>
 
                         <template
-                          v-else-if="item.type === 'header' || item.type === 'title' || item.type === 'italicText'"
+                          v-else-if="
+                            item.type === 'header' ||
+                            item.type === 'title' ||
+                            item.type === 'italicText'
+                          "
                         >
                           <el-input
                             v-model="item.valueType"
@@ -126,7 +157,11 @@
                           <label>Tiêu đề</label>
                           <el-input v-model="item.title" />
                           <label>Nội dung chính</label>
-                          <el-input v-model="item.textMain" type="textarea" :autosize="{ minRows: 1, maxRows: 4 }" />
+                          <el-input
+                            v-model="item.textMain"
+                            type="textarea"
+                            :autosize="{ minRows: 1, maxRows: 4 }"
+                          />
                           <label>Tiêu đề phụ</label>
                           <el-input v-model="item.subTitle" />
                         </template>
@@ -160,7 +195,10 @@
                             >
                               {{ t('configUser.importImage') }}
                             </p>
-                            <p class="file-note text-center" style="color: #a4a6a7">
+                            <p
+                              class="file-note text-center"
+                              style="color: #a4a6a7"
+                            >
                               ({{ $t('configUser.importLimitAndType', ['Jpg/Png', '10MB']) }})
                             </p>
                           </el-upload>
@@ -171,43 +209,85 @@
                 </el-col>
 
                 <!-- Cột bên phải: xem trước -->
-                <el-col :span="12" class="pb-7">
+                <el-col
+                  :span="12"
+                  class="pb-7"
+                >
                   <h5 class="text-black font-semibold text-base">Mẫu hiển thị</h5>
                   <el-card class="mt-1 h-full">
                     <div class="flex items-center justify-between mb-1">
-                      <span class="tag-name">{{ infoPost.typePost ? infoPost.typePost.typeName : '' }}</span>
+                      <span class="tag-name paddingX-8">{{
+                        infoPost.type ? setNameType(infoPost.type) : ''
+                      }}</span>
                     </div>
-                    <h5 class="text-xl text-black font-medium text-center">{{ infoPost.name }}</h5>
+                    <h5 class="text-xl text-black font-medium text-center">{{ infoPost.title }}</h5>
 
-                    <div v-for="(item, index) in arrDescription" :key="index" class="mt-2">
-                      <p v-if="item.type === 'text'" class="text-custom text-justify">{{ item.valueType }}</p>
+                    <div
+                      v-for="(item, index) in arrDescription"
+                      :key="index"
+                      class="mt-2"
+                    >
+                      <p
+                        v-if="item.type === 'text'"
+                        class="text-custom text-justify"
+                      >
+                        {{ item.valueType }}
+                      </p>
 
-                      <h3 v-if="item.type === 'header'" class="text-header-post text-justify">{{ item.valueType }}</h3>
+                      <h3
+                        v-if="item.type === 'header'"
+                        class="text-header-post text-justify"
+                      >
+                        {{ item.valueType }}
+                      </h3>
 
                       <h4
                         v-if="item.type === 'title'"
                         class="text-lg text-justify font-semibold"
-                      >{{ item.valueType }}</h4>
+                      >
+                        {{ item.valueType }}
+                      </h4>
 
-                      <p v-if="item.type === 'italicText'" class="text-base italic text-justify">{{ item.valueType }}</p>
+                      <p
+                        v-if="item.type === 'italicText'"
+                        class="text-base italic text-justify"
+                      >
+                        {{ item.valueType }}
+                      </p>
 
-                      <div v-else-if="item.type === 'tag'" class="my-6">
+                      <div
+                        v-else-if="item.type === 'tag'"
+                        class="my-6"
+                      >
                         <span class="tag-custom">{{ item.valueType }}</span>
                       </div>
 
-                      <div v-else-if="item.type === 'blockquote'" class="box-blockquote">
+                      <div
+                        v-else-if="item.type === 'blockquote'"
+                        class="box-blockquote"
+                      >
                         <p class="name-block">"{{ item.title }}"</p>
-                        <p class="main-block">{{ item.textMain }} - <span style="font-style: italic">{{ item.subTitle }}</span></p>
+                        <p class="main-block">
+                          {{ item.textMain }} -
+                          <span style="font-style: italic">{{ item.subTitle }}</span>
+                        </p>
                       </div>
 
-                      <div v-else-if="item.type === 'image'" class="flex items-center justify-center mt-3 mb-3">
+                      <div
+                        v-else-if="item.type === 'image'"
+                        class="flex items-center justify-center mt-3 mb-3"
+                      >
                         <img
                           v-if="item.imgLink.length > 0"
-                          :src="baseUrl + 'media-service/api/v1.0/images' + item.imgLink[0].url.replace(/^\.\/uploads/, '/uploads')"
+                          :src="
+                            baseUrl +
+                            'media-service/api/v1.0/images' +
+                            item.imgLink[0].url.replace(/^\.\/uploads/, '/uploads')
+                          "
                           alt=""
                           class="w-full"
                           style="aspect-ratio: 1.8/1; object-fit: contain"
-                        >
+                        />
                       </div>
                     </div>
                   </el-card>
@@ -222,16 +302,16 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from 'vue'
-import {useI18n} from '@/locale'
-import {useRoute, useRouter} from 'vue-router'
-import {ElMessage, ElMessageBox} from 'element-plus'
-import {uploadFile} from '@/api/product'
-import {useConfig} from '@/config'
+import { onMounted, ref } from 'vue'
+import { useI18n } from '@/locale'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { uploadFile } from '@/api/product'
+import { useConfig } from '@/config'
+import {apiCreatePost, apiGetById, apiUpdatePost} from '@/api/post'
 
 const { t } = useI18n()
 const router = useRouter()
-const route = useRoute()
 const user = ref({})
 const config = useConfig()
 const baseUrl = ref(config.VITE_PROXY_DOMAIN)
@@ -247,13 +327,29 @@ const props = defineProps({
   isCreate: {
     type: Boolean,
     default: false,
-  }
+  },
 })
 const ruleEdit = ref({
-  name: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }],
-  typePost: {
-    id: [{ required: true, message: t('omsSetting.ruleEnter'), trigger: 'blur' }]
-  },
+  title: [{ required: true, message: 'Nhập tiêu đề', trigger: 'blur' }],
+  type: [
+    { required: true, message: 'Chọn loại', trigger: 'change' },
+    {
+      validator: (rule, value, callback) => {
+        if (
+          value === null ||
+          value === undefined ||
+          value === '' ||
+          value === 0 ||
+          value === '0'
+        ) {
+          callback(new Error('Chọn loại hợp lệ'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'change',
+    },
+  ],
 })
 const listTypePost = ref([
   {
@@ -289,12 +385,8 @@ const lstTypeDescription = ref([
 ])
 
 const processing = ref(false)
-const id_post = ref(null)
-const infoPost = ref({
-  typePost: {
-    id: '',
-  }
-})
+const route = useRoute()
+const infoPost = ref({})
 const formPost = ref(null)
 const typeId = ref(null)
 const arrDescription = ref([])
@@ -302,12 +394,25 @@ const arrDescription = ref([])
 onMounted(() => {
   user.value = JSON.parse(localStorage.getItem('userInfo'))
   setDataDefault()
+  if (props.isEdit) {
+    initData()
+  }
 })
 
 const setDataDefault = () => {}
 const initData = async () => {
   try {
-    const params = {}
+    const id_post = ref(route.params.id || null)
+    const rs = await apiGetById(id_post.value)
+    if (rs.code === 200) {
+      infoPost.value = rs.data
+      console.log(rs.data.content, 'aaa')
+      if (rs.data.content) {
+        arrDescription.value = JSON.parse(rs.data.content)
+      }
+    } else {
+      ElMessage.error(rs.message)
+    }
   } catch (e) {
     console.log(e)
   }
@@ -315,11 +420,25 @@ const initData = async () => {
 
 const handleCreate = async () => {
   try {
-    await Promise.all([
-      validFormData()
-    ])
+    await Promise.all([validFormData()])
     processing.value = true
     processing.value = false
+    console.log(infoPost.value)
+    console.log(arrDescription.value)
+    const params = {
+      title: infoPost.value.title,
+      content: JSON.stringify(arrDescription.value),
+      type: infoPost.value.type,
+    }
+    const rs = await apiCreatePost(params)
+    console.log('Giá trị type khi submit:', params.type)
+    if (rs.code === 201) {
+      console.log('Success')
+      ElMessage.success('Thêm thành công')
+      backPostManage()
+    } else {
+      ElMessage.error(rs.message)
+    }
   } catch (e) {
     processing.value = false
     console.log(e)
@@ -327,11 +446,23 @@ const handleCreate = async () => {
 }
 const handleUpdate = async () => {
   try {
-    await Promise.all([
-      validFormData()
-    ])
+    await Promise.all([validFormData()])
     processing.value = true
     processing.value = false
+    const params = {
+      title: infoPost.value.title,
+      content: JSON.stringify(arrDescription.value),
+      type: infoPost.value.type,
+    }
+    const rs = await apiUpdatePost(params, infoPost.value.id)
+    console.log('Giá trị type khi submit:', params.type)
+    if (rs.code === 200) {
+      console.log('Success')
+      ElMessage.success('Cập nhật thành công')
+      backPostManage()
+    } else {
+      ElMessage.error(rs.message)
+    }
   } catch (e) {
     processing.value = false
     console.log(e)
@@ -353,7 +484,7 @@ const validFormData = async () => {
   })
 }
 
-const handleAddType = (value) => {
+const handleAddType = value => {
   const type = lstTypeDescription.value.find(t => t.value === value)
   if (!type) return
 
@@ -366,7 +497,7 @@ const handleAddType = (value) => {
     title: { valueType: '' },
     italicText: { valueType: '' },
     image: { imgLink: [], listImage: [] },
-    blockquote: { title: '', textMain: '', subTitle: '' }
+    blockquote: { title: '', textMain: '', subTitle: '' },
   }
 
   const extraData = typeDataMap[type.value]
@@ -376,7 +507,7 @@ const handleAddType = (value) => {
 
   typeId.value = null
 }
-const deleteType = (index) => {
+const deleteType = index => {
   arrDescription.value.splice(index, 1)
 }
 
@@ -416,7 +547,7 @@ const handleChangeFile = async (file, fileList, index) => {
     }
     if (rs.code === 201) {
       arrDescription.value[index].imgLink.push({
-        url: rs.data.filePath
+        url: rs.data.filePath,
       })
     } else {
       const index = fileList.indexOf(file)
@@ -461,6 +592,13 @@ const handleRemove = (file, fileList) => {
   indexDeleteFile.value = null
 }
 
+const setNameType = type => {
+  const item = listTypePost.value.find(item => item.id === type)
+  if (item) {
+    return item.label
+  }
+}
+
 const backPostManage = () => {
   router.push('/communication/post')
 }
@@ -469,7 +607,7 @@ const backPostManage = () => {
 <style lang="scss">
 .tag-name {
   color: rgba(34, 197, 94);
-  background-color: rgba(34, 197, 94, .1);
+  background-color: rgba(34, 197, 94, 0.1);
   padding: 2px 4px;
   border-radius: 4px;
 }
@@ -482,7 +620,7 @@ const backPostManage = () => {
   margin-inline-end: 0px;
   unicode-bidi: isolate;
   font-size: 15px;
-  font-family: "Font Awesome 6 Brands", serif;
+  font-family: 'Font Awesome 6 Brands', serif;
 }
 
 .text-header-post {
