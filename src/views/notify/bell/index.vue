@@ -168,6 +168,7 @@ import { useUserStore, useNotifyStore } from '@/store'
 import { formatDateTime } from '@/utils/date'
 import NotifyDialog from './notify-dialog'
 import { useI18n } from '@/locale'
+import {connectWebSocket} from '@/socketPlugin'
 
 const { t } = useI18n()
 const notifyStore = useNotifyStore()
@@ -183,30 +184,52 @@ const params = ref({
 })
 
 onMounted(() => {
+  getUser()
   getList()
+  connectWs()
 })
+
+const userInfo = ref({})
+const getUser = async () => {
+  userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+  console.log(userInfo.value.userId, 'aaaaaaaaaaaaaaaaaaaa')
+}
+const connectWs = () => {
+  console.log('hahahahah')
+  connectWebSocket({
+    serverUrl: '103.154.62.40:8007',
+    path: '/api/v1.0/ws',
+    topics: [
+      '/topic/admin-system/user/' + userInfo.value.userId + '/notifications',
+    ],
+    onMessage: (topic, data, raw) => {
+      console.log(`Received message from ${topic}:`, data)
+    }
+  })
+}
+
 const getList = () => {
   listLoading.value = true
-  const userId = userStore.uuid
 
-  // notifyStore
-  //   .apiGetNotifyByUser(params.value, userId)
-  //   .then(res => {
-  //     if (res.status === 200) {
-  //       list.value = res.data.content
-  //       totalItem.value = res.data.totalElements
-  //       getCountNotify()
-  //       if (!isShowNotify.value) {
-  //         timeoutId = setTimeout(getList, 60000)
-  //       }
-  //     }
-  //   })
-  //   .catch(err => {
-  //     console.log(err)
-  //   })
-  //   .finally(() => {
-  //     listLoading.value = false
-  //   })
+  notifyStore
+    .apiGetNotifyByUser(userInfo.value.userId)
+    .then(res => {
+      if (res.code === 200) {
+        list.value = res.data
+        // totalItem.value = res.data.totalElements
+        totalItem.value = list.value.length
+        getCountNotify()
+        if (!isShowNotify.value) {
+          timeoutId = setTimeout(getList, 60000)
+        }
+      }
+    })
+    .catch(err => {
+      console.log(err)
+    })
+    .finally(() => {
+      listLoading.value = false
+    })
 }
 const updateList = () => {
   listLoading.value = true
@@ -216,8 +239,8 @@ const updateList = () => {
     .apiUpdateNotifyByUser(userId)
     .then(res => {
       if (res.status === 200) {
-        // list.value = res.data.content
-        // getCountNotify()
+        list.value = res.data.content
+        getCountNotify()
       }
     })
     .catch(err => {
@@ -245,6 +268,7 @@ const getCountNotify = async () => {
   //   })
   //   .catch(_ => {})
   totalValue.value = list.value.length > 0 ? list.value.filter(item => !item.seen).length : 0
+  console.log('total', totalValue.value)
   notifyStore.SET_NUMBER_NOTIFY(totalValue.value)
 }
 const handleReadNotify = async row => {

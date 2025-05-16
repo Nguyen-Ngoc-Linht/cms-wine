@@ -1,4 +1,4 @@
-import http from '@/utils/request'
+import http from '@/utils/requestNotif'
 
 export function getNotifyList(data) {
   return http.request({
@@ -43,11 +43,10 @@ export function changeReceiveNotify(data) {
     data,
   })
 }
-export function apiGetNotifyByUser(data, id) {
+export function apiGetNotifyByUser(id) {
   return http.request({
     method: 'get',
-    url: '/category/notify/' + id,
-    data,
+    url: '/api/v1.0/notifications/get-all-by-user/' + id,
   })
 }
 export function apiUpdateNotifyByUser(id) {
