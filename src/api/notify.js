@@ -51,7 +51,7 @@ export function apiGetNotifyByUser(id) {
 }
 export function apiUpdateNotifyByUser(id) {
   return http.request({
-    method: 'put',
-    url: '/category/notify/' + id,
+    method: 'get',
+    url: '/api/v1.0/notifications/get-all-by-user/' + id,
   })
 }

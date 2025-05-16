@@ -204,6 +204,9 @@ const connectWs = () => {
     ],
     onMessage: (topic, data, raw) => {
       console.log(`Received message from ${topic}:`, data)
+      getList()
+      updateList()
+      getCountNotify()
     }
   })
 }
@@ -233,13 +236,12 @@ const getList = () => {
 }
 const updateList = () => {
   listLoading.value = true
-  const userId = userStore.uuid
 
   notifyStore
-    .apiUpdateNotifyByUser(userId)
+    .apiUpdateNotifyByUser(userInfo.value.userId)
     .then(res => {
-      if (res.status === 200) {
-        list.value = res.data.content
+      if (res.code === 200) {
+        list.value = res.data
         getCountNotify()
       }
     })

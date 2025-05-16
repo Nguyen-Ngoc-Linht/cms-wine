@@ -30,7 +30,7 @@ const useNotifyStore = defineStore({
     async apiUpdateNotifyByUser(id) {
       try {
         const res = await apiUpdateNotifyByUser(id)
-        if (res.status === 200) {
+        if (res.code === 200) {
           return res
         }
       } catch (error) {
