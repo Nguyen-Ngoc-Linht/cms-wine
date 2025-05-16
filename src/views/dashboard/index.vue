@@ -71,8 +71,8 @@
       </el-col>
     </el-row>
     <el-row :gutter="20" class="mt-5">
-      <el-col :span="12">
-        <el-card class="card-bar">
+      <el-col :span="16">
+        <el-card class="card-bar h-full">
           <div class="flex justify-between paddingX-20">
             <h5 class="text-xl font-semibold">Biểu đồ doanh thu</h5>
           </div>
@@ -82,13 +82,16 @@
       <el-col :span="8">
         <el-card class="h-full">
           <div class="flex justify-between">
-            <h5 class="text-xl font-semibold">Danh sách sản phẩm bán chạy</h5>
+            <h5 class="text-xl font-semibold">Sản phẩm bán chạy</h5>
           </div>
+          <Pie :data="dataBar"/>
         </el-card>
       </el-col>
-      <el-col :span="4">
-        <el-card class="h-full"></el-card>
-      </el-col>
+    </el-row>
+    <el-row class="mt-5">
+      <el-card class="w-full">
+        <Map />
+      </el-card>
     </el-row>
   </div>
 </template>
@@ -97,8 +100,10 @@
 import { onMounted, reactive, ref, watch } from 'vue'
 import {apiGetOrderStatistic, apiGetRevenueStatistic} from '@/api/dashboard'
 import Bar from '@/views/dashboard/components/Bar.vue'
+import Pie from '@/views/dashboard/components/Pie.vue'
 import {cloneDeep} from 'lodash-unified'
 import moment from 'moment'
+import Map from '@/views/dashboard/components/Map.vue'
 
 const defaultFilter = {
   type: 1,
