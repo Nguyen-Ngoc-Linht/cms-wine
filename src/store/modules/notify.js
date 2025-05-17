@@ -17,10 +17,10 @@ const useNotifyStore = defineStore({
     SET_IS_RECEIVE_NOTIFY(data) {
       this.isReceiveNotify = data
     },
-    async apiGetNotifyByUser(params, id) {
+    async apiGetNotifyByUser(id) {
       try {
-        const res = await apiGetNotifyByUser(params, id)
-        if (res.status === 200) {
+        const res = await apiGetNotifyByUser(id)
+        if (res.code === 200) {
           return res
         }
       } catch (error) {
@@ -30,7 +30,7 @@ const useNotifyStore = defineStore({
     async apiUpdateNotifyByUser(id) {
       try {
         const res = await apiUpdateNotifyByUser(id)
-        if (res.status === 200) {
+        if (res.code === 200) {
           return res
         }
       } catch (error) {
