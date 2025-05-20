@@ -86,6 +86,20 @@
             <el-col :span="24" :sm="12">
               <el-form-item
                 class="custom mb-5"
+                label="Thứ tự hiển thị"
+                prop="displayIndex"
+              >
+                <el-input
+                  v-model="infoCategory.displayIndex"
+                  type="number"
+                  maxlength="250"
+                  :placeholder="$t('configUser.pleaseEnter')"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24" :sm="12">
+              <el-form-item
+                class="custom mb-5"
                 label="Nguồn gốc xuất xứ"
                 prop="origin"
               >
