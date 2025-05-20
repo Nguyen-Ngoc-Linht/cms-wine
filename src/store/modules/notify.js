@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { apiGetNotifyByUser, apiUpdateNotifyByUser } from '@/api/notify'
+import {apiGetNotifyByUser, apiUpdateNotifyByUser, countNotifyByUser} from '@/api/notify'
 
 const useNotifyStore = defineStore({
   id: 'notify',
@@ -17,9 +17,9 @@ const useNotifyStore = defineStore({
     SET_IS_RECEIVE_NOTIFY(data) {
       this.isReceiveNotify = data
     },
-    async apiGetNotifyByUser(id) {
+    async apiGetNotifyByUser(id, params) {
       try {
-        const res = await apiGetNotifyByUser(id)
+        const res = await apiGetNotifyByUser(id, params)
         if (res.code === 200) {
           return res
         }
@@ -27,9 +27,19 @@ const useNotifyStore = defineStore({
         return error
       }
     },
-    async apiUpdateNotifyByUser(id) {
+    async apiUpdateNotifyByUser(id, params) {
       try {
-        const res = await apiUpdateNotifyByUser(id)
+        const res = await apiUpdateNotifyByUser(id, params)
+        if (res.code === 200) {
+          return res
+        }
+      } catch (error) {
+        return error
+      }
+    },
+    async apiCountNotifyByUser(id) {
+      try {
+        const res = await countNotifyByUser(id)
         if (res.code === 200) {
           return res
         }
