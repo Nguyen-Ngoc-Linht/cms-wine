@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div class="w-full bg-white flex items-center justify-between px-4 py-3">
+    <div class="w-full bg-white flex items-center justify-between px-4 py-3"
+
+    >
       <h5 class="flex items-center">
         <div
           class="back pointer"
@@ -95,27 +97,42 @@
                 </el-select>
               </el-form-item>
             </el-col>
+            <el-col :span="12">
+              <el-form-item
+                prop="imageTitle"
+                label="Ảnh bìa"
+              >
+                <el-upload
+                  v-model:file-list="infoPost.imageTitle"
+                  class="avatar-uploader mt-0 custom-upload-list w-full"
+                  drag
+                  :on-success="null"
+                  :on-preview="null"
+                  :on-remove="handleRemove"
+                  :on-exceed="null"
+                  :auto-upload="false"
+                  list-type="picture-card"
+                  :limit="1"
+                  accept=".jpg,.png"
+                >
+                  <svg-icon
+                    icon-class="import-dialog"
+                    class="width-50 height-50"
+                  />
+                  <p class="drag-note my-2 font-semibold" style="color: #7c7e81">
+                    {{ t('configUser.importImage') }}
+                  </p>
+                  <p class="file-note text-center" style="color: #a4a6a7">
+                    ({{ $t('configUser.importLimitAndType', ['Jpg/Png', '10MB']) }})
+                  </p>
+                </el-upload>
+              </el-form-item>
+            </el-col>
             <el-col :span="24">
               <el-row :gutter="10">
                 <!-- Cột bên trái: nhập thông tin -->
                 <el-col :span="12">
                   <div>
-                    <div class="flex items-center justify-between">
-                      <h5 class="text-black font-semibold text-base w-1/2">Trường thông tin</h5>
-                      <el-select
-                        v-model="typeId"
-                        clearable
-                        @change="handleAddType"
-                        placeholder="Chọn thông tin hiển thị"
-                      >
-                        <el-option
-                          v-for="type in lstTypeDescription"
-                          :key="type.id"
-                          :label="type.name"
-                          :value="type.value"
-                        />
-                      </el-select>
-                    </div>
                     <div class="mt-3">
                       <el-card
                         v-for="(item, index) in arrDescription"
@@ -204,6 +221,22 @@
                           </el-upload>
                         </template>
                       </el-card>
+                    </div>
+                    <div class="flex items-center justify-between mt-3">
+                      <h5 class="text-black font-semibold text-base w-1/2">Trường thông tin</h5>
+                      <el-select
+                        v-model="typeId"
+                        clearable
+                        @change="handleAddType"
+                        placeholder="Chọn thông tin hiển thị"
+                      >
+                        <el-option
+                          v-for="type in lstTypeDescription"
+                          :key="type.id"
+                          :label="type.name"
+                          :value="type.value"
+                        />
+                      </el-select>
                     </div>
                   </div>
                 </el-col>

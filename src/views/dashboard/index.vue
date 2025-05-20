@@ -90,7 +90,6 @@
     </el-row>
     <el-row class="mt-5">
       <el-card class="w-full">
-        <Map />
       </el-card>
     </el-row>
   </div>
