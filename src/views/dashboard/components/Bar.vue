@@ -127,7 +127,11 @@ const updateOption = () => {
     })
   })
 
-  const resizeHandler = () => chartInstance.resize()
+  const resizeHandler = () => {
+    if (chartInstance) {
+      chartInstance.resize()
+    }
+  }
   window.addEventListener('resize', resizeHandler)
 
   return resizeHandler

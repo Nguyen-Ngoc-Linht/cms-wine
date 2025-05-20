@@ -63,3 +63,9 @@ export function countNotifyByUser(id) {
     url: '/api/v1.0/notifications/get-count-by-user/' + id,
   })
 }
+export function isReadNotify(id) {
+  return http.request({
+    method: 'get',
+    url: '/api/v1.0/notifications/' + id + '/is-read',
+  })
+}

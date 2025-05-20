@@ -104,12 +104,13 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { countNotifyByUser, getReceiveNotify, readNotify } from '@/api/notify.js'
+import {countNotifyByUser, getReceiveNotify, isReadNotify, readNotify} from '@/api/notify.js'
 import { useNotifyStore, useUserStore } from '@/store'
 import { formatDateTime } from '@/utils/date'
 import NotifyDialog from './notify-dialog'
 import { useI18n } from '@/locale'
 import { connectWebSocket } from '@/socketPlugin'
+import router from '@/router'
 
 const { t } = useI18n()
 const notifyStore = useNotifyStore()
@@ -144,7 +145,9 @@ const connectWs = () => {
     topics: ['/topic/admin-system/user/' + userInfo.value.userId + '/notifications'],
     onMessage: (topic, data, raw) => {
       console.log(`Received message from ${topic}:`, data)
-      getCountNotify()
+      setTimeout(() => {
+        getCountNotify()
+      }, 2000)
     },
   })
 }
@@ -209,11 +212,7 @@ const getCountNotify = async () => {
     })
 }
 const handleReadNotify = async row => {
-  const param = {
-    userId: userStore.uuid,
-    notiId: row.id,
-  }
-  const { status } = await readNotify(param)
+  const { status } = await isReadNotify(row.id)
   if (status === 200) {
     setTimeout(() => {
       getList()
@@ -223,7 +222,14 @@ const handleReadNotify = async row => {
 }
 
 const handleRowClick = row => {
-  console.log('tao an vao thong bao')
+  handleReadNotify(row)
+  if (row.meta) {
+    router.push({ path: row.meta }).catch(err => {
+      console.error('Router push error:', err)
+    })
+  } else {
+    console.warn('meta không tồn tại trong row:', row)
+  }
   // if (row.statusView === 0) {
   //   handleReadNotify(row)
   // }
