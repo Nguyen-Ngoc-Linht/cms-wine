@@ -16,7 +16,7 @@
               icon-class="el-icon-plus"
               class="width-20 height-20 margin-right-4"
             />
-            Thêm danh mục
+            Thêm nhà vang
           </div>
         </el-button>
       </div>
@@ -122,8 +122,23 @@ const router = useRouter()
 const fields = ref([
   {
     key: 'name',
-    label: 'Tên thuộc tính',
+    label: 'Tên nhà vang',
     prop: 'name',
+  },
+  {
+    key: 'title',
+    label: 'Tiêu đề',
+    prop: 'title',
+  },
+  {
+    key: 'origin',
+    label: 'Nguồn gốc xuất xứ',
+    prop: 'origin',
+  },
+  {
+    key: 'isShowHome',
+    label: 'Hiển thị trang chủ',
+    prop: 'isShowHome',
   },
   {
     key: 'description',
