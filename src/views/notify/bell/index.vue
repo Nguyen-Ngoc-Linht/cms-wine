@@ -135,7 +135,6 @@ onMounted(() => {
 const userInfo = ref({})
 const getUser = async () => {
   userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
-  console.log(userInfo.value.userId, 'aaaaaaaaaaaaaaaaaaaa')
 }
 const connectWs = () => {
   console.log('hahahahah')
@@ -145,6 +144,8 @@ const connectWs = () => {
     topics: ['/topic/admin-system/user/' + userInfo.value.userId + '/notifications'],
     onMessage: (topic, data, raw) => {
       console.log(`Received message from ${topic}:`, data)
+      const audio = new Audio('/sounds/ringtone-you-would-be-glad-to-know.mp3')
+      audio.play().catch(err => console.error('Audio play failed:', err))
       setTimeout(() => {
         getCountNotify()
       }, 2000)
