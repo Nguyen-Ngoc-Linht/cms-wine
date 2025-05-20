@@ -65,6 +65,39 @@ export default {
       },
     },
     {
+      path: 'category/add',
+      name: 'product-category-add',
+      component: () => import('@/views/category/add.vue'),
+      meta: {
+        title: 'Quản lý danh mục',
+        noCache: true,
+        hidden: true,
+        permissions: [''],
+      },
+    },
+    {
+      path: 'category/edit/:id',
+      name: 'product-category-edit',
+      component: () => import('@/views/category/edit.vue'),
+      meta: {
+        title: 'Quản lý danh mục',
+        noCache: true,
+        hidden: true,
+        permissions: [''],
+      },
+    },
+    {
+      path: 'category/view/:id',
+      name: 'product-category-view',
+      component: () => import('@/views/category/view.vue'),
+      meta: {
+        title: 'Quản lý danh mục',
+        noCache: true,
+        hidden: true,
+        permissions: [''],
+      },
+    },
+    {
       path: 'attributes',
       name: 'product-attributes',
       component: () => import('@/views/attributes/index.vue'),

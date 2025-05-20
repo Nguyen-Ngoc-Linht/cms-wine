@@ -19,81 +19,22 @@
         </span>
       </div>
       <template #dropdown>
-        <!--                <el-dropdown-menu class="notify-bell-dropdown">-->
-        <!--                  <el-card-->
-        <!--                    v-if="isShowNotify"-->
-        <!--                    v-loading="listLoading"-->
-        <!--                    shadow="never"-->
-        <!--                    class="box-card-notify scroll-bar relative"-->
-        <!--                    :body-style="{ padding: '15px' }"-->
-        <!--                  >-->
-        <!--                    <template v-if="list && list.length > 0">-->
-        <!--                      <div-->
-        <!--                        v-for="(item, key) in list"-->
-        <!--                        :key="key"-->
-        <!--                        class="notify"-->
-        <!--                      >-->
-        <!--                        <el-row-->
-        <!--                          :gutter="10"-->
-        <!--                          class="notify-item"-->
-        <!--                          :class="{ 'not-viewed': !item.seen }"-->
-        <!--                          @click="handleRowClick(item)"-->
-        <!--                        >-->
-        <!--                          <el-col-->
-        <!--                            :span="24"-->
-        <!--                            style="padding: 8px 16px"-->
-        <!--                          >-->
-        <!--                            <h6>{{ item.title || '' }}</h6>-->
-        <!--                            <div class="noti-content d-flex">-->
-        <!--                              <div-->
-        <!--                                class="noti-content"-->
-        <!--                                v-html="replaceContent(item.content)"-->
-        <!--                              />-->
-        <!--                            </div>-->
-        <!--                            <div class="noti-date margin-right-16 text-right color-#76809b">-->
-        <!--                              {{ formatDateTime(item.createTime) }}-->
-        <!--                            </div>-->
-        <!--                          </el-col>-->
-        <!--                          <el-col-->
-        <!--                            :span="24"-->
-        <!--                            class="p-0 margin-left-5"-->
-        <!--                          >-->
-        <!--                            <el-divider-->
-        <!--                              v-if="key < list.length - 1"-->
-        <!--                              class="my-0 margin-top-8"-->
-        <!--                            />-->
-        <!--                          </el-col>-->
-        <!--                        </el-row>-->
-        <!--                      </div>-->
-        <!--                    </template>-->
-        <!--                    <template v-else>-->
-        <!--                      <div class="empty-notify">Không có thông báo!</div>-->
-        <!--                    </template>-->
-        <!--                    <div class="clear-fix" />-->
-        <!--                    <template #footer>-->
-        <!--                      <div>-->
-        <!--                        <el-button type="primary" @click="loadMoreNotify">Xem thêm</el-button>-->
-        <!--                      </div>-->
-        <!--                    </template>-->
-        <!--                  </el-card>-->
-        <!--                </el-dropdown-menu>-->
-        <!--        menu new-->
         <div class="box-card-notify scroll-bar">
           <div class="sticky-title">
             <div class="flex justify-between items-center">
               <div class="heading">
                 <h5>{{ t('notify.notifyBell') }}</h5>
               </div>
-              <!--             <div>-->
-              <!--               <router-link to="/notify/notify">-->
-              <!--                 <el-link-->
-              <!--                   type="primary"-->
-              <!--                   style="border-bottom: 1px solid #0078d4"-->
-              <!--                   class="mt-0 text-center font-weight-bold text-[#0078d4]"-->
-              <!--                   >{{ t('notify.viewAll') }}-->
-              <!--                 </el-link>-->
-              <!--               </router-link>-->
-              <!--             </div>-->
+              <div>
+                <router-link to="/notify/notify">
+                  <el-link
+                    type="primary"
+                    style="border-bottom: 1px solid #0078d4"
+                    class="mt-0 text-center font-weight-bold text-[#0078d4]"
+                    >{{ t('notify.viewAll') }}
+                  </el-link>
+                </router-link>
+              </div>
             </div>
           </div>
           <div v-if="list && list.length > 0">
@@ -105,7 +46,7 @@
               <el-row
                 :gutter="10"
                 class="notify-item"
-                :class="{ 'not-viewed': !item.seen }"
+                :class="{ 'not-viewed': item.status == 'SENT' }"
                 @click="handleRowClick(item)"
               >
                 <el-col
@@ -120,7 +61,7 @@
                     />
                   </div>
                   <div class="noti-date margin-right-16 text-right color-#76809b">
-                    {{ formatDateTime(item.createTime) }}
+                    {{ formatDateTime(item.createdDate) }}
                   </div>
                 </el-col>
                 <el-col
@@ -162,13 +103,14 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
-import { getNotifyList, readNotify, countNotify, getReceiveNotify } from '@/api/notify.js'
-import { useUserStore, useNotifyStore } from '@/store'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import {countNotifyByUser, getReceiveNotify, isReadNotify, readNotify} from '@/api/notify.js'
+import { useNotifyStore, useUserStore } from '@/store'
 import { formatDateTime } from '@/utils/date'
 import NotifyDialog from './notify-dialog'
 import { useI18n } from '@/locale'
-import {connectWebSocket} from '@/socketPlugin'
+import { connectWebSocket } from '@/socketPlugin'
+import router from '@/router'
 
 const { t } = useI18n()
 const notifyStore = useNotifyStore()
@@ -180,7 +122,8 @@ const listLoading = ref(true)
 let timeoutId
 const flagLoadMore = ref(true)
 const params = ref({
-  limit: 10,
+  page: 1,
+  size: 10,
 })
 
 onMounted(() => {
@@ -199,28 +142,25 @@ const connectWs = () => {
   connectWebSocket({
     serverUrl: '103.154.62.40:8007',
     path: '/api/v1.0/ws',
-    topics: [
-      '/topic/admin-system/user/' + userInfo.value.userId + '/notifications',
-    ],
+    topics: ['/topic/admin-system/user/' + userInfo.value.userId + '/notifications'],
     onMessage: (topic, data, raw) => {
       console.log(`Received message from ${topic}:`, data)
-      getList()
-      updateList()
-      getCountNotify()
-    }
+      setTimeout(() => {
+        getCountNotify()
+      }, 2000)
+    },
   })
 }
 
 const getList = () => {
   listLoading.value = true
-
   notifyStore
-    .apiGetNotifyByUser(userInfo.value.userId)
+    .apiGetNotifyByUser(userInfo.value.userId, params.value)
     .then(res => {
       if (res.code === 200) {
         list.value = res.data
         // totalItem.value = res.data.totalElements
-        totalItem.value = list.value.length
+        // totalItem.value = list.value.length
         getCountNotify()
         if (!isShowNotify.value) {
           timeoutId = setTimeout(getList, 60000)
@@ -238,7 +178,7 @@ const updateList = () => {
   listLoading.value = true
 
   notifyStore
-    .apiUpdateNotifyByUser(userInfo.value.userId)
+    .apiUpdateNotifyByUser(userInfo.value.userId, params.value)
     .then(res => {
       if (res.code === 200) {
         list.value = res.data
@@ -258,27 +198,21 @@ const numberNotify = computed(() => {
 })
 
 const getCountNotify = async () => {
-  // countNotify({
-  //   app: 'OMS',
-  // })
-  //   .then(res => {
-  //     if (res.status == 200) {
-  //       const { data } = res
-  //       totalValue.value = data ? data.countNotiNotRead : 0
-  //       notifyStore.SET_NUMBER_NOTIFY(totalValue.value)
-  //     }
-  //   })
-  //   .catch(_ => {})
-  totalValue.value = list.value.length > 0 ? list.value.filter(item => !item.seen).length : 0
-  console.log('total', totalValue.value)
-  notifyStore.SET_NUMBER_NOTIFY(totalValue.value)
+  countNotifyByUser(userInfo.value.userId)
+    .then(res => {
+      if (res.code === 200) {
+        const { data } = res
+        totalValue.value = data ?? 0
+        notifyStore.SET_NUMBER_NOTIFY(totalValue.value)
+        totalItem.value = totalValue.value
+      }
+    })
+    .catch(() => {
+      console.log('error getCountNotify')
+    })
 }
 const handleReadNotify = async row => {
-  const param = {
-    userId: userStore.uuid,
-    notiId: row.id,
-  }
-  const { status } = await readNotify(param)
+  const { status } = await isReadNotify(row.id)
   if (status === 200) {
     setTimeout(() => {
       getList()
@@ -288,6 +222,14 @@ const handleReadNotify = async row => {
 }
 
 const handleRowClick = row => {
+  handleReadNotify(row)
+  if (row.meta) {
+    router.push({ path: row.meta }).catch(err => {
+      console.error('Router push error:', err)
+    })
+  } else {
+    console.warn('meta không tồn tại trong row:', row)
+  }
   // if (row.statusView === 0) {
   //   handleReadNotify(row)
   // }
@@ -353,7 +295,7 @@ const receiveNotifySocket = () => {
   }, 2000)
 }
 const loadMoreNotify = () => {
-  params.value.limit += 10
+  params.value.size += 10
   getList()
 }
 onBeforeUnmount(() => {

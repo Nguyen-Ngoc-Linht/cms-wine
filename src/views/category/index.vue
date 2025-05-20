@@ -115,7 +115,9 @@ import {apiDeleteCategory, apiGetCategory} from '@/api/product'
 import Dialog from '@/components/Dialog/index.vue'
 import { ElMessage } from 'element-plus'
 import FormCategory from '@/views/category/FormCategory.vue'
+import {useRouter} from 'vue-router'
 const { t } = useI18n()
+const router = useRouter()
 
 const fields = ref([
   {
@@ -172,16 +174,14 @@ const getList = async () => {
 }
 
 const openAddCategory = () => {
-  titleDialog.value = 'Thêm danh mục'
-  typeDialog.value = 'add'
-  infoCategory.value = {}
-  showDialog.value = true
+  router.push('/product/category/add')
 }
 const openEditCategory = (data) => {
-  titleDialog.value = 'Sửa danh mục'
-  typeDialog.value = 'edit'
-  infoCategory.value = data
-  showDialog.value = true
+  router.push(`/product/category/edit/${data.id}`)
+  // titleDialog.value = 'Sửa danh mục'
+  // typeDialog.value = 'edit'
+  // infoCategory.value = data
+  // showDialog.value = true
 }
 const openDialogDelete = (data) => {
   infoCategory.value = data
