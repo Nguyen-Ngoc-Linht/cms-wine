@@ -118,6 +118,9 @@
                 :on-preview="null"
                 :on-exceed="null"
                 :auto-upload="false"
+                :before-remove="beforeRemove"
+                :on-remove="handleRemove"
+                :on-change="handleChangeFile"
                 list-type="picture-card"
                 multiple
                 accept=".jpg,.png"
@@ -166,13 +169,17 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useI18n } from '@/locale'
-import { ElMessage } from 'element-plus'
-import {apiCreateCategory, apiUpdateCategory} from '@/api/product'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {apiCreateCategory, apiGetCategoryDetail, apiUpdateCategory, uploadFile} from '@/api/product'
 import {useRoute, useRouter} from 'vue-router'
+import {useConfig} from '@/config'
 
 const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
+const user = ref({})
+const config = useConfig()
+const baseUrl = ref(config.VITE_PROXY_DOMAIN)
 
 const props = defineProps({
   isEdit: {
@@ -229,11 +236,35 @@ const lstCountry = ref([
 ])
 
 onMounted(async () => {
-  infoCategory.value = { ...props.categoryInfo }
-  if (props.typeDialog === 'view') {
-  } else if (props.typeDialog === 'add') {
+  id_category.value = route.params.id
+  user.value = JSON.parse(localStorage.getItem('userInfo'))
+  if (props.isEdit || props.isView) {
+    await initData()
   }
 })
+
+const initData = async () => {
+  try {
+    const rs = await apiGetCategoryDetail(id_category.value)
+    if (rs.code === 200) {
+      infoCategory.value = rs.data
+      convertData()
+    }
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+const convertData = () => {
+  const imagesProduct = infoCategory.value.image
+  if (imagesProduct) {
+    infoCategory.value.listImage = []
+    infoCategory.value.listImage.push({
+      name: 'item' + imagesProduct.id,
+      url: baseUrl.value + 'media-service/api/v1.0/images' + imagesProduct.replace(/^\.\/uploads/, '/uploads')
+    })
+  }
+}
 
 const handleAddCategory = async () => {
   try {
@@ -241,15 +272,19 @@ const handleAddCategory = async () => {
     processing.value = true
     const params = {
       name: infoCategory.value.name,
+      isShowHome: infoCategory.value.isShowHome,
+      image: infoCategory.value.image,
+      title: infoCategory.value.title,
+      origin: infoCategory.value.origin,
       description: infoCategory.value.description,
     }
+    console.log(params, infoCategory.value)
     const rs = await apiCreateCategory(params)
     if (rs.code === 201) {
       ElMessage.success('Thêm danh mục thành công')
-      // emit('closeUpdate')
+      backCategory()
     } else {
       ElMessage.success('Thêm danh mục thất bại')
-      // emit('closeUpdate')
     }
     processing.value = false
   } catch (e) {
@@ -264,12 +299,16 @@ const handleEditCategory = async () => {
     processing.value = true
     const params = {
       name: infoCategory.value.name,
+      isShowHome: infoCategory.value.isShowHome,
+      image: infoCategory.value.image,
+      title: infoCategory.value.title,
+      origin: infoCategory.value.origin,
       description: infoCategory.value.description,
     }
     const rs = await apiUpdateCategory(infoCategory.value.id, params)
     if (rs.code === 200) {
       ElMessage.success('Sửa thuộc tính thành công')
-      // emit('closeUpdate')
+      backCategory()
     } else {
       ElMessage.success('Thêm thuộc tính thất bại')
       // emit('closeUpdate')
@@ -290,6 +329,95 @@ const validFormData = async () => {
       }
     })
   })
+}
+
+const handleChangeFile = async (file, fileList) => {
+  try {
+    const isAllowedSize = file.size / 1024 / 1024 < 10
+    if (!isAllowedSize) {
+      const index = fileList.indexOf(file)
+      if (index > -1) {
+        fileList.splice(index, 1)
+      }
+      ElMessage.error(t('configUser.message.overflowMaxSize', ['10']))
+      return false
+    }
+    const allowedTypes = ['image/jpeg', 'image/png']
+    if (!allowedTypes.includes(file.raw.type)) {
+      const index = fileList.indexOf(file)
+      if (index > -1) {
+        fileList.splice(index, 1)
+      }
+      ElMessage.error('File không đúng định dạng .jpg/.png')
+      return false
+    }
+    const fileToUpload = file.raw || file
+    if (!fileToUpload || !(fileToUpload instanceof File)) {
+      console.error('Invalid file provided:', file)
+      return
+    }
+    const formData = new FormData()
+    formData.append('file', fileToUpload)
+    formData.append('user_id', user.value.userId)
+    formData.append('server_name', 'wine')
+
+    const rs = await uploadFile(formData)
+    if (rs.code === 201) {
+      infoCategory.value.image = rs.data.filePath
+      console.log(infoCategory.value.image)
+    } else {
+      const index = fileList.indexOf(file)
+      if (index > -1) {
+        fileList.splice(index, 1)
+      }
+      ElMessage.error('Tải file thất bại')
+      return false
+    }
+  } catch (e) {
+    const index = fileList.indexOf(file)
+    if (index > -1) {
+      fileList.splice(index, 1)
+    }
+    console.log(e)
+    ElMessage.error('Tải file thất bại')
+    return false
+  }
+}
+const handlePreview = file => {
+  if (file.url) {
+    window.open(file.url, '_blank')
+  } else if (file.raw) {
+    const fileUrl = URL.createObjectURL(file.raw)
+    window.open(fileUrl, '_blank')
+  } else {
+    ElMessage.error('Không thể xem trước file này')
+  }
+}
+const beforeRemove = (file, fileList) => {
+  return ElMessageBox.confirm(t('administration.ip.confirmDeleteFile'), {
+    confirmButtonText: t('omsSetting.confirm'),
+    cancelButtonText: t('omsSetting.cancel'),
+    confirmButtonClass: 'el-button--main',
+    cancelButtonClass: 'el-button--secondary',
+    buttonSize: 'default',
+  }).then(
+    () => {
+      const index = fileList.indexOf(file)
+      if (index > -1) {
+        indexDeleteFile.value = index
+      }
+      return true
+    },
+    () => false
+  )
+}
+const indexDeleteFile = ref(null)
+const handleRemove = (file, fileList) => {
+  console.log(indexDeleteFile.value, 'vị trí xóa')
+  console.log(infoCategory.value.images, 'trước khi xóa')
+  infoCategory.value.images.splice(indexDeleteFile.value, 1)
+  console.log(infoCategory.value.images, 'sau khi xóa')
+  indexDeleteFile.value = null
 }
 
 const backCategory = () => {

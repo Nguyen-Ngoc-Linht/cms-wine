@@ -59,7 +59,7 @@ export default {
       name: 'product-category',
       component: () => import('@/views/category/index.vue'),
       meta: {
-        title: 'Quản lý danh mục',
+        title: 'Quản lý nhà vang',
         noCache: true,
         permissions: [''],
       },
@@ -69,7 +69,7 @@ export default {
       name: 'product-category-add',
       component: () => import('@/views/category/add.vue'),
       meta: {
-        title: 'Quản lý danh mục',
+        title: 'Quản lý nhà vang',
         noCache: true,
         hidden: true,
         permissions: [''],
@@ -80,7 +80,7 @@ export default {
       name: 'product-category-edit',
       component: () => import('@/views/category/edit.vue'),
       meta: {
-        title: 'Quản lý danh mục',
+        title: 'Quản lý nhà vang',
         noCache: true,
         hidden: true,
         permissions: [''],
@@ -91,7 +91,7 @@ export default {
       name: 'product-category-view',
       component: () => import('@/views/category/view.vue'),
       meta: {
-        title: 'Quản lý danh mục',
+        title: 'Quản lý nhà vang',
         noCache: true,
         hidden: true,
         permissions: [''],

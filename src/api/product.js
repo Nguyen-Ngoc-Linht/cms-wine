@@ -50,6 +50,13 @@ export function apiGetCategory(data) {
   })
 }
 
+export function apiGetCategoryDetail(category_id) {
+  return http.request({
+    method: 'get',
+    url: `/wine-service/api/v1.0/managements/categories/${category_id}`,
+  })
+}
+
 export function apiCreateCategory(data) {
   return http.request({
     method: 'post',
