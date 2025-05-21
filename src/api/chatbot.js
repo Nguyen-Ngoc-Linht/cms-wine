@@ -39,7 +39,7 @@ export function apiSetDefaultData(data_id) {
 export function apiDownloadFile(filePath) {
   return http.request({
     method: 'get',
-    url: `/chatbot-service/api/v1.0/data-his/download${filePath}`,
+    url: `/chatbot-service/api/v1.0/data-his/download/${filePath}`,
     responseType: 'blob'
   })
 }

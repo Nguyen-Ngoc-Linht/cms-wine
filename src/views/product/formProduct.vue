@@ -441,7 +441,8 @@ const formatValidValue = () => {
   })
   return {
     name: infoProduct.value.name,
-    description: infoProduct.value.description,
+    title: infoProduct.value.title,
+    description: JSON.stringify(infoProduct.value.description),
     categoryId: infoProduct.value.category.id,
     attributes: attributesProductLst,
     images: infoProduct.value.images,
