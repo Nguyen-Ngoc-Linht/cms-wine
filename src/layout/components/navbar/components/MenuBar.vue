@@ -57,6 +57,7 @@ defineOptions({
 .menu-content > .active {
   background: #e8f0fe;
 }
+
 .app-name {
   word-break: break-word;
 }

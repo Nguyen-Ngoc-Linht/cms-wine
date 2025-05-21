@@ -1,22 +1,48 @@
-import io from 'socket.io-client'
-const socketPlugin = {
-  install: (app, options) => {
-    const { serverUrl, ...optionsOther } = options
-    const socket = io(serverUrl, { ...optionsOther })
+import { over } from 'stompjs'
 
-    socket.on('connect', () => {
-      console.log('Socket connected!')
-    })
+let stompClient = null
 
-    // Thêm socket vào prototype của Vue để có thể sử dụng ở mọi component
-    app.config.globalProperties.$socket = socket
-    app.provide('$socket', socket)
+/**
+ * Kết nối WebSocket
+ * @param {Object} options
+ * @param {string} options.serverUrl - URL server (không bao gồm path)
+ * @param {string} options.path - Path WebSocket (ví dụ: /ws)
+ * @param {string[]} options.topics - Danh sách các topic để subscribe
+ * @param {function} options.onMessage - Hàm callback xử lý khi nhận message
+ */
+export const connectWebSocket = options => {
+  const fullUrl = `ws://${options.serverUrl}${options.path}`
+  const socket = new WebSocket(fullUrl)
 
-    // Bắt sự kiện khi có dữ liệu từ server
-    socket.on('receiveNotification', data => {
-      // Xử lý dữ liệu nhận được ở đây
-    })
-  },
+  console.log('fullUrl', fullUrl)
+  stompClient = over(socket)
+
+  stompClient.connect(
+    {},
+    frame => {
+      console.log('WebSocket connected:', frame)
+
+      options.topics.forEach(topic => {
+        stompClient.subscribe(topic, message => {
+          try {
+            const data = JSON.parse(message.body)
+            options.onMessage(topic, data, message)
+          } catch (err) {
+            console.error(`Error parsing message from ${topic}:`, err)
+          }
+        })
+      })
+    },
+    error => {
+      console.error('WebSocket connection error:', error)
+    }
+  )
 }
 
-export default socketPlugin
+export const disconnectWebSocket = () => {
+  if (stompClient && stompClient.connected) {
+    stompClient.disconnect(() => {
+      console.log('WebSocket disconnected')
+    })
+  }
+}

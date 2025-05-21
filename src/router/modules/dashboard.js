@@ -17,7 +17,7 @@ export default {
       name: 'dashboard-ch',
       component: () => import('@/views/dashboard/index.vue'),
       meta: {
-        title: 'Dashboard',
+        title: 'Trang chủ',
         noCache: false,
         permissions: [''],
       },
