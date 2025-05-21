@@ -196,19 +196,27 @@ const handleDefaultMethodChange = async id => {
   await getList()
 }
 
-const downloadFile = async filePath => {
-  console.log('Đường dẫn ban đầu:', filePath)
+const downloadFile = async (filePath) => {
   try {
     await ElMessageBox.confirm('Bạn có chắc chắn muốn tải file?', 'Xác nhận', {
       confirmButtonText: 'Có',
       cancelButtonText: 'Hủy',
-      type: 'success',
+      type: 'success'
     })
 
-    filePath = filePath.slice(1)
+    filePath = filePath.startsWith('/') ? filePath : '/' + filePath
 
-    const response = await apiDownloadFile(filePath)
-    const blob = new Blob([response.data])
+    const blobPromise = apiDownloadFile(filePath)
+    console.log('blobPromise:', blobPromise)
+
+    const blob = await blobPromise
+    console.log('blob after await:', blob)
+    console.log('blob in downloadFile:', blob)
+
+    if (!blob || !blob.type || typeof blob.size !== 'number') {
+      throw new Error('Dữ liệu tải về không phải Blob')
+    }
+
     const url = window.URL.createObjectURL(blob)
 
     const link = document.createElement('a')
@@ -228,10 +236,7 @@ const downloadFile = async filePath => {
     console.error('Lỗi tải file:', error)
     ElMessage.error('Tải file thất bại')
   }
-
-  await getList()
 }
-
 </script>
 
 <style lang="scss">
