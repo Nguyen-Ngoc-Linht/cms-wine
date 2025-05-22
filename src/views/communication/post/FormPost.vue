@@ -103,13 +103,14 @@
                 label="Ảnh bìa"
               >
                 <el-upload
-                  v-model:file-list="infoPost.imageTitle"
+                  v-model:file-list="infoPost.imagesBanner"
                   class="avatar-uploader mt-0 custom-upload-list w-full"
                   drag
                   :on-success="null"
                   :on-preview="null"
                   :on-remove="handleRemove"
                   :on-exceed="null"
+                  :on-change="handleChangeFileBanner"
                   :auto-upload="false"
                   list-type="picture-card"
                   :limit="1"
@@ -439,15 +440,38 @@ const initData = async () => {
     const rs = await apiGetById(id_post.value)
     if (rs.code === 200) {
       infoPost.value = rs.data
-      console.log(rs.data.content, 'aaa')
+      // console.log(rs.data.content, 'aaa')
       if (rs.data.content) {
         arrDescription.value = JSON.parse(rs.data.content)
+        convertDataImage()
       }
     } else {
       ElMessage.error(rs.message)
     }
   } catch (e) {
     console.log(e)
+  }
+}
+const convertDataImage = () => {
+  // console.log(Array.isArray(arrDescription.value) && arrDescription.value.length > 0, arrDescription.value)
+  if (Array.isArray(arrDescription.value) && arrDescription.value.length > 0) {
+    arrDescription.value.forEach((item) => {
+      if (item.type === 'image') {
+        item.listImage = [
+          {
+            name: 'item' + item.imgLink[0].id,
+            url: baseUrl.value + 'media-service/api/v1.0/images' + item.imgLink[0].url.replace(/^\.\/uploads/, '/uploads')
+          }
+        ]
+      }
+    })
+  }
+  if (infoPost.value.banner) {
+    infoPost.value.imagesBanner = []
+    infoPost.value.imagesBanner = [{
+      name: 'banner',
+      url: baseUrl.value + 'media-service/api/v1.0/images' + infoPost.value.banner.replace(/^\.\/uploads/, '/uploads')
+    }]
   }
 }
 
@@ -462,6 +486,7 @@ const handleCreate = async () => {
       title: infoPost.value.title,
       content: JSON.stringify(arrDescription.value),
       type: infoPost.value.type,
+      banner: infoPost.value.banner,
     }
     const rs = await apiCreatePost(params)
     console.log('Giá trị type khi submit:', params.type)
@@ -484,6 +509,7 @@ const handleUpdate = async () => {
     processing.value = false
     const params = {
       title: infoPost.value.title,
+      banner: infoPost.value.banner,
       content: JSON.stringify(arrDescription.value),
       type: infoPost.value.type,
     }
@@ -623,6 +649,61 @@ const handleRemove = (file, fileList) => {
   console.log(indexDeleteFile.value, 'vị trí xóa')
   arrDescription.value[indexDeleteFile.value].imgLink.splice(0, 1)
   indexDeleteFile.value = null
+}
+
+const handleChangeFileBanner = async (file, fileList) => {
+  try {
+    const isAllowedSize = file.size / 1024 / 1024 < 10
+    if (!isAllowedSize) {
+      const index = fileList.indexOf(file)
+      if (index > -1) {
+        fileList.splice(index, 1)
+      }
+      ElMessage.error(t('configUser.message.overflowMaxSize', ['10']))
+      return false
+    }
+    const allowedTypes = ['image/jpeg', 'image/png']
+    if (!allowedTypes.includes(file.raw.type)) {
+      const index = fileList.indexOf(file)
+      if (index > -1) {
+        fileList.splice(index, 1)
+      }
+      ElMessage.error('File không đúng định dạng .jpg/.png')
+      return false
+    }
+    const fileToUpload = file.raw || file
+    if (!fileToUpload || !(fileToUpload instanceof File)) {
+      console.error('Invalid file provided:', file)
+      return
+    }
+    const formData = new FormData()
+    formData.append('file', fileToUpload)
+    formData.append('user_id', user.value.userId)
+    formData.append('server_name', 'wine')
+
+    const rs = await uploadFile(formData)
+    if (!Array.isArray(infoPost.value.imagesBanner)) {
+      infoPost.value.imagesBanner = []
+    }
+    if (rs.code === 201) {
+      infoPost.value.banner = rs.data.filePath
+    } else {
+      const index = fileList.indexOf(file)
+      if (index > -1) {
+        fileList.splice(index, 1)
+      }
+      ElMessage.error('Tải file thất bại')
+      return false
+    }
+  } catch (e) {
+    const index = fileList.indexOf(file)
+    if (index > -1) {
+      fileList.splice(index, 1)
+    }
+    console.log(e)
+    ElMessage.error('Tải file thất bại')
+    return false
+  }
 }
 
 const setNameType = type => {
