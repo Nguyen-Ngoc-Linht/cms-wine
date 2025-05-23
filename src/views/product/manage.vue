@@ -201,6 +201,7 @@ const defaultFilter = {
   page: 1,
   size: 10,
   total: 0,
+  keyword: '',
 }
 const filter = reactive(cloneDeep(defaultFilter))
 const showDialog = ref(false)
@@ -218,7 +219,9 @@ const getList = async () => {
     paged: {
       page: filter.page,
       size: filter.size
-    }
+    },
+    name: filter.keyword,
+    categoryIds: []
   }
   const rs = await apiGetProduct(params)
   if (rs.code === 200) {
