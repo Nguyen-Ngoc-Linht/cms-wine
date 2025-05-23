@@ -172,7 +172,7 @@ const fields = ref([
   },
   {
     key: 'category',
-    label: 'Thuộc tính',
+    label: 'Nhà Vang',
     prop: 'category',
   },
   {
@@ -201,6 +201,7 @@ const defaultFilter = {
   page: 1,
   size: 10,
   total: 0,
+  keyword: '',
 }
 const filter = reactive(cloneDeep(defaultFilter))
 const showDialog = ref(false)
@@ -218,7 +219,9 @@ const getList = async () => {
     paged: {
       page: filter.page,
       size: filter.size
-    }
+    },
+    name: filter.keyword,
+    categoryIds: []
   }
   const rs = await apiGetProduct(params)
   if (rs.code === 200) {
@@ -292,9 +295,9 @@ const handlePageChange = page => {
   color: #0078d4;
 }
 .product-image {
-  width: 100px;  /* Điều chỉnh chiều rộng */
-  height: 100px; /* Điều chỉnh chiều cao */
-  object-fit: cover; /* Cắt ảnh cho vừa khung mà không méo */
-  border-radius: 8px; /* Bo góc ảnh */
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 8px;
 }
 </style>
