@@ -1,55 +1,77 @@
 <template>
-  <div class="chart-cont">
-    <div ref="chartRef" class="chart" v-if="data.length"></div>
-    <div></div>
+  <div class="pie-chart-container">
+    <div v-if="loading" class="loading-container">
+      <el-skeleton :rows="6" animated />
+    </div>
+    <div v-else ref="chartRef" class="chart"></div>
   </div>
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch, computed } from 'vue'
+import { ref, onMounted, watch, nextTick, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
-import moment from 'moment'
-
-const chartRef = ref(null)
-let chartInstance = null
 
 const props = defineProps({
   data: {
     type: Array,
-    default: () => [],
+    default: () => []
   },
-  color: {
-    type: String,
-    default: '#4D86FF',
-  },
+  loading: {
+    type: Boolean,
+    default: false
+  }
 })
 
-const xData = computed(() => props.data.map(i => moment(i.date).format('DD/MM')))
-const yData = computed(() => props.data.map(i => i.revenue))
+const chartRef = ref(null)
+let chartInstance = null
 
 const initChart = () => {
-  chartInstance = echarts.init(chartRef.value)
-  updateOption()
-}
+  if (!chartRef.value || props.loading) return
 
-const updateOption = () => {
-  const options = {
+  chartInstance = echarts.init(chartRef.value)
+
+  const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
+
+  const seriesData = props.data.map((item, index) => ({
+    name: item.name.length > 20 ? item.name.substring(0, 20) + '...' : item.name,
+    value: item.value,
+    itemStyle: {
+      color: colors[index % colors.length]
+    }
+  }))
+
+  const option = {
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
+      formatter: function(params) {
+        return `<div style="font-weight: 600; margin-bottom: 4px;">${params.name}</div>
+                <div>Đã bán: <span style="font-weight: 600;">${params.value} sản phẩm</span></div>
+                <div>Tỷ lệ: <span style="font-weight: 600;">${params.percent}%</span></div>`
+      }
     },
     legend: {
-      top: '5%',
-      left: 'center'
+      orient: 'vertical',
+      left: 'left',
+      top: 'middle',
+      textStyle: {
+        fontSize: 11,
+        color: '#6b7280'
+      },
+      formatter: function(name) {
+        return name.length > 15 ? name.substring(0, 15) + '...' : name
+      }
     },
     series: [
       {
-        name: 'Access From',
+        name: 'Sản phẩm bán chạy',
         type: 'pie',
-        radius: ['30%', '75%'],
+        radius: ['40%', '70%'],
+        center: ['65%', '50%'],
         avoidLabelOverlap: false,
-        padAngle: 2,
         itemStyle: {
-          borderRadius: 6
+          borderRadius: 4,
+          borderColor: '#fff',
+          borderWidth: 2
         },
         label: {
           show: false,
@@ -58,42 +80,83 @@ const updateOption = () => {
         emphasis: {
           label: {
             show: true,
-            fontSize: 24,
+            fontSize: 14,
             fontWeight: 'bold',
-            fontFamily: 'Inter',
+            color: '#111827'
+          },
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
           }
         },
         labelLine: {
           show: false
         },
-        data: [
-          { value: 1048, name: 'Vang đỏ' },
-          { value: 735, name: 'Vang trắng' },
-          { value: 580, name: 'Vang Pháp' },
-          { value: 484, name: 'Rượu Bình dân' },
-          { value: 300, name: 'Khác' }
-        ]
+        data: seriesData
       }
     ]
   }
-  chartInstance.setOption(options)
+
+  chartInstance.setOption(option)
 }
 
-watch(() => props.data, updateOption, { deep: true })
+const resizeChart = () => {
+  if (chartInstance) {
+    chartInstance.resize()
+  }
+}
 
-onMounted(() => {
-  initChart()
-  window.addEventListener('resize', () => chartInstance.resize())
+watch(() => props.data, () => {
+  if (!props.loading) {
+    nextTick(() => {
+      initChart()
+    })
+  }
+}, { deep: true })
+
+watch(() => props.loading, (newVal) => {
+  if (!newVal) {
+    nextTick(() => {
+      initChart()
+    })
+  }
 })
 
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', () => chartInstance.resize())
+onMounted(() => {
+  if (!props.loading) {
+    nextTick(() => {
+      initChart()
+    })
+  }
+
+  window.addEventListener('resize', resizeChart)
+})
+
+onUnmounted(() => {
+  if (chartInstance) {
+    chartInstance.dispose()
+  }
+  window.removeEventListener('resize', resizeChart)
 })
 </script>
 
 <style scoped>
+.pie-chart-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
 .chart {
   width: 100%;
-  height: 350px;
+  height: 100%;
+}
+
+.loading-container {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 </style>

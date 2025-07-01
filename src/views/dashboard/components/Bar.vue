@@ -1,254 +1,260 @@
 <template>
-  <div class="chart-container w-full">
-    <div ref="chartRef" class="chart"></div>
+  <div class="bar-chart-container">
+    <div v-if="loading" class="loading-container">
+      <el-skeleton :rows="8" animated />
+    </div>
+    <div v-else ref="chartRef" class="chart"></div>
   </div>
 </template>
 
 <script setup>
-import {onMounted, onBeforeUnmount, ref, computed, watch} from 'vue'
+import {ref, onMounted, watch, nextTick, onUnmounted} from 'vue'
 import * as echarts from 'echarts'
-import moment from 'moment'
-import {formatNumber} from '@/utils'
-
-const chartRef = ref(null)
-let chartInstance = null
 
 const props = defineProps({
   data: {
     type: Array,
-    default: () => [],
+    default: () => []
   },
-  color: {
-    type: String,
-    default: '#4D86FF',
-  },
+  loading: {
+    type: Boolean,
+    default: false
+  }
 })
 
-const xData = computed(() => props.data.map(i => moment(i.date).format('DD/MM')))
-const yData = computed(() => props.data.map(i => i.revenue))
+const chartRef = ref(null)
+let chartInstance = null
 
 const initChart = () => {
-  if (!chartRef.value || !props.data.length) {
-    console.warn('Chart reference or data is missing')
-    return
-  }
+  if (!chartRef.value || props.loading) return
 
   chartInstance = echarts.init(chartRef.value)
-  updateOption()
-}
-const updateOption = () => {
-  const zoomSize = 6
+
+  const dates = props.data.map(item => {
+    const date = new Date(item.date)
+    return `${date.getDate()}/${date.getMonth() + 1}`
+  })
+
+  const revenues = props.data.map(item => item.revenue)
+  const orders = props.data.map(item => item.orders || Math.floor(item.revenue / 50000))
+
   const option = {
-    title: null,
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'shadow' },
-      formatter: (params) => {
-        const val = params[0].data
-        return `${params[0].axisValue}: <b>${formatNumber(val, '.')}đ</b>`
+      axisPointer: {
+        type: 'cross',
+        crossStyle: {
+          color: '#999'
+        }
       },
+      formatter: function(params) {
+        let result = `<div style="font-weight: 600; margin-bottom: 8px;">${params[0].axisValue}</div>`
+        params.forEach(param => {
+          if (param.seriesName === 'Doanh thu') {
+            result += `<div style="display: flex; align-items: center; margin-bottom: 4px;">
+              <span style="display: inline-block; width: 10px; height: 10px; background: ${param.color}; border-radius: 50%; margin-right: 8px;"></span>
+              ${param.seriesName}: <span style="font-weight: 600; margin-left: 8px;">${formatCurrency(param.value)}</span>
+            </div>`
+          } else {
+            result += `<div style="display: flex; align-items: center;">
+              <span style="display: inline-block; width: 10px; height: 10px; background: ${param.color}; border-radius: 50%; margin-right: 8px;"></span>
+              ${param.seriesName}: <span style="font-weight: 600; margin-left: 8px;">${param.value} đơn</span>
+            </div>`
+          }
+        })
+        return result
+      }
     },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '5%',
-      top: '6.4%',
-      containLabel: true,
-    },
-    xAxis: {
-      data: xData.value,
-      axisLabel: {
-        inside: false,
-        color: '#666',
+    legend: {
+      data: ['Doanh thu', 'Đơn hàng'],
+      top: 10,
+      textStyle: {
         fontSize: 12,
-        rotate: 0,
-      },
-      axisTick: { show: false },
-      axisLine: {
-        show: true,
-        lineStyle: { color: '#ccc' },
-      },
-      z: 10,
+        color: '#6b7280'
+      }
     },
-    yAxis: {
-      axisLine: { show: false },
-      axisTick: { show: false },
-      axisLabel: {
-        color: '#999',
-        formatter: value => {
-          if (value >= 1e9) return (value / 1e9).toFixed(1) + 'tỉ'
-          if (value >= 1e6) return (value / 1e6).toFixed(1) + 'tr'
-          if (value >= 1e3) return (value / 1e3).toFixed(1) + 'k'
-          return value
+    xAxis: [
+      {
+        type: 'category',
+        data: dates,
+        axisPointer: {
+          type: 'shadow'
         },
+        axisLine: {
+          lineStyle: {
+            color: '#e5e7eb'
+          }
+        },
+        axisLabel: {
+          color: '#6b7280',
+          fontSize: 11
+        }
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        name: 'Doanh thu (VND)',
+        position: 'left',
+        axisLabel: {
+          formatter: function(value) {
+            return formatShortCurrency(value)
+          },
+          color: '#6b7280',
+          fontSize: 11
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#e5e7eb'
+          }
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#f3f4f6'
+          }
+        }
       },
-    },
-    dataZoom: [{ type: 'inside' }],
+      {
+        type: 'value',
+        name: 'Đơn hàng',
+        position: 'right',
+        axisLabel: {
+          formatter: '{value} đơn',
+          color: '#6b7280',
+          fontSize: 11
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#e5e7eb'
+          }
+        }
+      }
+    ],
     series: [
       {
+        name: 'Doanh thu',
         type: 'bar',
-        showBackground: true,
+        yAxisIndex: 0,
+        data: revenues,
         itemStyle: {
-          shadowColor: 'rgba(0, 0, 0, 0.2)',
-          shadowBlur: 10,
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#83bff6' },
-            { offset: 0.5, color: '#188df0' },
-            { offset: 1, color: '#188df0' },
+            { offset: 0, color: '#3b82f6' },
+            { offset: 1, color: '#1d4ed8' }
           ]),
+          borderRadius: [4, 4, 0, 0]
         },
         emphasis: {
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#2378f7' },
-              { offset: 0.7, color: '#2378f7' },
-              { offset: 1, color: '#83bff6' },
-            ]),
-          },
-        },
-        data: yData.value,
+              { offset: 0, color: '#2563eb' },
+              { offset: 1, color: '#1e40af' }
+            ])
+          }
+        }
       },
+      {
+        name: 'Đơn hàng',
+        type: 'line',
+        yAxisIndex: 1,
+        data: orders,
+        lineStyle: {
+          color: '#10b981',
+          width: 3
+        },
+        itemStyle: {
+          color: '#10b981'
+        },
+        symbol: 'circle',
+        symbolSize: 6,
+        emphasis: {
+          itemStyle: {
+            color: '#059669',
+            borderColor: '#fff',
+            borderWidth: 2
+          }
+        }
+      }
     ],
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    }
   }
 
   chartInstance.setOption(option)
-  const length = yData.value.length
-  chartInstance.on('click', (params) => {
-    const startIndex = Math.max(params.dataIndex - zoomSize / 2, 0)
-    const endIndex = Math.min(
-      params.dataIndex + zoomSize / 2,
-      length - 1
-    )
-
-    chartInstance.dispatchAction({
-      type: 'dataZoom',
-      startValue: xData[startIndex],
-      endValue: xData[endIndex],
-    })
-  })
-
-  const resizeHandler = () => {
-    if (chartInstance) {
-      chartInstance.resize()
-    }
-  }
-  window.addEventListener('resize', resizeHandler)
-
-  return resizeHandler
 }
 
-watch(() => props.data, updateOption, { deep: true })
-onMounted(() => {
-  const resizeHandler = initChart()
-  chartRef.value.resizeHandler = resizeHandler
+const formatCurrency = (value) => {
+  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VND'
+}
+
+const formatShortCurrency = (value) => {
+  if (value >= 1000000) {
+    return (value / 1000000).toFixed(1) + 'M'
+  } else if (value >= 1000) {
+    return (value / 1000).toFixed(1) + 'K'
+  }
+  return value.toString()
+}
+
+const resizeChart = () => {
+  if (chartInstance) {
+    chartInstance.resize()
+  }
+}
+
+watch(() => props.data, () => {
+  if (!props.loading) {
+    nextTick(() => {
+      initChart()
+    })
+  }
+}, { deep: true })
+
+watch(() => props.loading, (newVal) => {
+  if (!newVal) {
+    nextTick(() => {
+      initChart()
+    })
+  }
 })
 
-onBeforeUnmount(() => {
+onMounted(() => {
+  if (!props.loading) {
+    nextTick(() => {
+      initChart()
+    })
+  }
+
+  window.addEventListener('resize', resizeChart)
+})
+
+onUnmounted(() => {
   if (chartInstance) {
     chartInstance.dispose()
-    chartInstance = null
   }
-  if (chartRef.value?.resizeHandler) {
-    window.removeEventListener('resize', chartRef.value.resizeHandler)
-  }
+  window.removeEventListener('resize', resizeChart)
 })
 </script>
 
 <style scoped>
-.chart-container {
+.bar-chart-container {
   width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .chart {
   width: 100%;
-  height: 500px;
+  height: 100%;
+}
+
+.loading-container {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 </style>
-
-<!--<template>-->
-<!--  <div class="chart-cont">-->
-<!--    <div ref="chartRef" class="chart" v-if="data.length"></div>-->
-<!--    <div></div>-->
-<!--  </div>-->
-<!--</template>-->
-
-<!--<script setup>-->
-<!--import { onBeforeUnmount, onMounted, ref, watch, computed } from 'vue'-->
-<!--import * as echarts from 'echarts'-->
-<!--import moment from 'moment'-->
-
-<!--const chartRef = ref(null)-->
-<!--let chartInstance = null-->
-
-<!--const props = defineProps({-->
-<!--  data: {-->
-<!--    type: Array,-->
-<!--    default: () => [],-->
-<!--  },-->
-<!--  color: {-->
-<!--    type: String,-->
-<!--    default: '#4D86FF',-->
-<!--  },-->
-<!--})-->
-
-<!--const xData = computed(() => props.data.map(i => moment(i.date).format('DD/MM')))-->
-<!--const yData = computed(() => props.data.map(i => i.revenue))-->
-
-<!--const initChart = () => {-->
-<!--  chartInstance = echarts.init(chartRef.value)-->
-<!--  updateOption()-->
-<!--}-->
-
-<!--const updateOption = () => {-->
-<!--  const options = {-->
-<!--    grid: {-->
-<!--      left: '50px',-->
-<!--      right: '20px',-->
-<!--      top: '20px',-->
-<!--      bottom: '50px',-->
-<!--    },-->
-<!--    xAxis: {-->
-<!--      type: 'category',-->
-<!--      data: xData.value,-->
-<!--      axisLabel: { fontSize: 12 },-->
-<!--    },-->
-<!--    yAxis: {-->
-<!--      type: 'value',-->
-<!--      axisLabel: { fontSize: 12 },-->
-<!--    },-->
-<!--    tooltip: {-->
-<!--      trigger: 'axis',-->
-<!--      formatter: params => {-->
-<!--        return `${params[0].axisValue}: <b>${params[0].data}</b> VND`-->
-<!--      },-->
-<!--    },-->
-<!--    series: [-->
-<!--      {-->
-<!--        type: 'bar',-->
-<!--        data: yData.value,-->
-<!--        itemStyle: { color: props.color },-->
-<!--        barWidth: '50%',-->
-<!--      },-->
-<!--    ],-->
-<!--  }-->
-<!--  chartInstance.setOption(options)-->
-<!--}-->
-
-<!--watch(() => props.data, updateOption, { deep: true })-->
-
-<!--onMounted(() => {-->
-<!--  initChart()-->
-<!--  window.addEventListener('resize', () => chartInstance.resize())-->
-<!--})-->
-
-<!--onBeforeUnmount(() => {-->
-<!--  window.removeEventListener('resize', () => chartInstance.resize())-->
-<!--})-->
-<!--</script>-->
-
-<!--<style scoped>-->
-<!--.chart {-->
-<!--  width: 100%;-->
-<!--  height: 350px;-->
-<!--}-->
-<!--</style>-->

@@ -93,7 +93,7 @@
             </span>
           </template>
           <template #totalAmount="{ row }">
-            <span>{{ formatNumber(row.totalAmount, '.') + ' VND' }}</span>
+            <span>{{ formatNumber(row.totalAmount, '.') }}</span>
           </template>
           <template #createTime="{ row }">
             <span>{{ formatDate(row.createTime) }}</span>
@@ -228,7 +228,7 @@ const titleDialog = ref(t('monitoring.errorHandling.sendEvent'))
 const fields = ref([
   {
     key: 'id',
-    label: 'ID',
+    label: 'Mã đơn',
     prop: 'id',
     width: 70,
     align: 'center',
@@ -241,7 +241,7 @@ const fields = ref([
   },
   {
     key: 'totalAmount',
-    label: 'Tổng tiền',
+    label: 'Tổng tiền (VND)',
     prop: 'totalAmount',
   },
   {
