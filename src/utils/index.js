@@ -161,6 +161,60 @@ export function formatNumber(number, separator = ',') {
     .join('')
 }
 
+export const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}/${month}/${year}`
+}
+
+export const formatDateTime = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${day}/${month}/${year} ${hours}:${minutes}`
+}
+
+export const formatStatusOrder = (status) => {
+  const statusMap = {
+    SUCCESS: 'Thành công',
+    FAILED: 'Không thành công',
+    PENDING: 'Đang chờ xử lý',
+    PROCESSING: 'Đang được xử lý',
+    CANCELED: 'Đã bị hủy',
+    REFUNDED: 'Đã hoàn tiền'
+  }
+  return statusMap[status] || 'Trạng thái không xác định'
+}
+
+export const formatPaymentMethod = (method) => {
+  const methodMap = {
+    VNPAY: 'Thanh toán VNPAY',
+    MOMO: 'Thanh toán MOMO',
+    QRCODE: 'Quét mã QRCODE',
+    CASH: 'Tiền mặt'
+  }
+  return methodMap[method] || method
+}
+
+export const getStatusType = (status) => {
+  const typeMap = {
+    SUCCESS: 'success',
+    FAILED: 'danger',
+    PENDING: 'warning',
+    PROCESSING: 'primary',
+    CANCELED: 'info',
+    REFUNDED: 'success'
+  }
+  return typeMap[status] || 'info'
+}
+
 /**
  * unique array
  * @param {*} array
