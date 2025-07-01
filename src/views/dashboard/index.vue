@@ -342,7 +342,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, computed } from 'vue'
+import {onMounted, reactive, ref, computed, watch} from 'vue'
 import { cloneDeep } from 'lodash-unified'
 import moment from 'moment'
 import Bar from './components/Bar.vue'
@@ -705,6 +705,32 @@ const getDataDefault = async () => {
 // Lifecycle
 onMounted(() => {
   getDataDefault()
+})
+
+watch(() => filter.type, () => {
+  handleFilterTypeChange()
+  console.log(filter, 'aaaa')
+})
+
+watch(() => filter.timeSearch, () => {
+  if (filter.type === 1) {
+    getDataDefault()
+    console.log('TimeSearch changed', filter)
+  }
+})
+
+watch([() => filter.month, () => filter.year], () => {
+  if (filter.type === 2 && filter.month && filter.year) {
+    getDataDefault()
+    console.log('Month/Year changed', filter)
+  }
+})
+
+watch(() => filter.selectedYear, () => {
+  if (filter.type === 3 && filter.selectedYear) {
+    getDataDefault()
+    console.log('SelectedYear changed', filter)
+  }
 })
 </script>
 
