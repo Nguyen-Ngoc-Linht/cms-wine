@@ -13,12 +13,16 @@ import * as echarts from 'echarts'
 
 const props = defineProps({
   data: {
-    type: Array,
-    default: () => []
+    type: Object,
+    default: () => ({})
   },
   loading: {
     type: Boolean,
     default: false
+  },
+  type: {
+    type: Number,
+    default: 2
   }
 })
 
@@ -30,13 +34,27 @@ const initChart = () => {
 
   chartInstance = echarts.init(chartRef.value)
 
-  const dates = props.data.map(item => {
-    const date = new Date(item.date)
-    return `${date.getDate()}/${date.getMonth() + 1}`
-  })
+  let dates = []
+  let revenues = []
+  let orders = []
 
-  const revenues = props.data.map(item => item.revenue)
-  const orders = props.data.map(item => item.orders || Math.floor(item.revenue / 50000))
+  console.log('initChart ', props.type)
+  if (props.type === 3) {
+    dates = props.data.map(item => `Tháng ${item.month}/${item.year}`)
+    revenues = props.data.map(item => Number(item.revenue))
+    orders = props.data.map(item => Number(item.totalOrders))
+  } else {
+    dates = props.data.map(item => {
+      const date = new Date(item.date)
+      if (!isNaN(date)) {
+        return `${date.getDate()}/${date.getMonth() + 1}`
+      } else {
+        return 'Không rõ'
+      }
+    })
+    revenues = props.data.map(item => Number(item.revenue))
+    orders = props.data.map(item => Number(item.totalOrders))
+  }
 
   const option = {
     tooltip: {
@@ -118,6 +136,8 @@ const initChart = () => {
         type: 'value',
         name: 'Đơn hàng',
         position: 'right',
+        minInterval: 1,
+        interval: 1,
         axisLabel: {
           formatter: '{value} đơn',
           color: '#6b7280',

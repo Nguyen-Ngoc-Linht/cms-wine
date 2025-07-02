@@ -15,3 +15,18 @@ export function apiGetRevenueStatistic(data) {
     data,
   })
 }
+
+export function apiGetTopProductRevenue(data) {
+  return http.request({
+    method: 'post',
+    url: '/wine-service/api/v1.0/managements/dashboard/get-products-sales',
+    data,
+  })
+}
+
+export function apiGetRecentOrders() {
+  return http.request({
+    method: 'get',
+    url: '/wine-service/api/v1.0/managements/dashboard/get-recent-orders',
+  })
+}

@@ -205,7 +205,7 @@
                 </div>
                 <div class="flex items-center">
                   <el-button @click="handleEditVariant(index)" class="bg-outline-success text--success mt-3">Sửa</el-button>
-                  <el-button @click="handleDeleteVariant(index)" class="bg-outline-danger text--danger mt-3">Xóa</el-button>
+<!--                  <el-button @click="handleDeleteVariant(index)" class="bg-outline-danger text&#45;&#45;danger mt-3">Xóa</el-button>-->
                 </div>
               </el-card>
             </div>

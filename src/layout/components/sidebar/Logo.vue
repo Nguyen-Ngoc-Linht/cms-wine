@@ -8,8 +8,8 @@
         class="sidebar-logo-link cursor-pointer"
       >
         <svg-icon
-          icon-class="logo-vec"
-          class="sidebar-logo !mr-0"
+          icon-class="logo-wine"
+          class="sidebar-logo !mr-0 width-60 height-60"
           @click="toggleSideBar"
         />
       </div>
@@ -22,8 +22,8 @@
         @click="goHome"
       >
         <svg-icon
-          icon-class="logo-vec"
-          class="sidebar-logo"
+          icon-class="logo-wine"
+          class="sidebar-logo width-60 height-60"
         />
         <span class="sidebar-title fs-16">{{ title }} </span>
       </div>

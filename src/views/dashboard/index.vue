@@ -188,7 +188,7 @@
               </div>
             </div>
             <div class="chart-container">
-              <Bar :data="chartData" :loading="chartLoading" />
+              <Bar :data="chartData" :loading="chartLoading" :type="filter.type" />
             </div>
           </el-card>
         </el-col>
@@ -211,7 +211,7 @@
           <el-card class="table-card">
             <div class="table-header">
               <h5 class="table-title">Sản phẩm bán chạy nhất</h5>
-              <el-button type="text" class="view-all-btn">Xem tất cả</el-button>
+              <el-button type="text" class="view-all-btn no-border">Xem tất cả</el-button>
             </div>
             <div class="product-list">
               <div
@@ -221,15 +221,15 @@
               >
                 <div class="product-rank">{{ index + 1 }}</div>
                 <div class="product-image">
-                  <img :src="product.image" :alt="product.name" />
+                  <img :src="getImage(product.url)" :alt="product.name" />
                 </div>
                 <div class="product-info">
                   <h6 class="product-name">{{ product.name }}</h6>
                   <p class="product-category">{{ product.category }}</p>
                 </div>
                 <div class="product-stats">
-                  <div class="product-sold">{{ product.sold }} đã bán</div>
-                  <div class="product-price">{{ formatCurrency(product.price) }}</div>
+                  <div class="product-sold">{{ product.totalQuantity }} đã bán</div>
+                  <div class="product-price">{{ formatCurrency(product.totalRevenue) }}</div>
                 </div>
               </div>
             </div>
@@ -240,7 +240,7 @@
           <el-card class="table-card">
             <div class="table-header">
               <h5 class="table-title">Đơn hàng gần đây</h5>
-              <el-button type="text" class="view-all-btn">Xem tất cả</el-button>
+              <el-button type="text" class="view-all-btn no-border">Xem tất cả</el-button>
             </div>
             <div class="order-list">
               <div
@@ -250,7 +250,7 @@
               >
                 <div class="order-info">
                   <h6 class="order-id">#{{ order.id }}</h6>
-                  <p class="order-customer">{{ order.customerName }}</p>
+                  <p class="order-customer">{{ order.user.firstName + ' ' + order.user.lastName }}</p>
                   <p class="order-time">{{ formatDateTime(order.createTime) }}</p>
                 </div>
                 <div class="order-details">
@@ -347,62 +347,8 @@ import { cloneDeep } from 'lodash-unified'
 import moment from 'moment'
 import Bar from './components/Bar.vue'
 import Pie from './components/Pie.vue'
-
-// Mock API functions - replace with your actual API calls
-const apiGetOrderStatistic = async (params) => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500))
-  return {
-    code: 200,
-    data: {
-      totalOrder: 1247,
-      totalUserPurchases: 892,
-      totalCompletedOrder: 1156,
-      totalRefundedOrder: 91
-    }
-  }
-}
-
-const apiGetRevenueStatistic = async (params) => {
-  await new Promise(resolve => setTimeout(resolve, 500))
-
-  const dataPoints = []
-  const { type } = params
-
-  if (type === 1) {
-    // Dữ liệu theo ngày
-    for (let i = 14; i >= 0; i--) {
-      dataPoints.push({
-        date: moment().subtract(i, 'days').format('YYYY-MM-DD'),
-        revenue: Math.floor(Math.random() * 5000000) + 1000000,
-        orders: Math.floor(Math.random() * 50) + 10
-      })
-    }
-  } else if (type === 2) {
-    // Dữ liệu theo tháng (12 tháng gần nhất)
-    for (let i = 11; i >= 0; i--) {
-      dataPoints.push({
-        date: moment().subtract(i, 'months').format('YYYY-MM'),
-        revenue: Math.floor(Math.random() * 50000000) + 10000000,
-        orders: Math.floor(Math.random() * 500) + 100
-      })
-    }
-  } else if (type === 3) {
-    // Dữ liệu theo năm (5 năm gần nhất)
-    for (let i = 4; i >= 0; i--) {
-      dataPoints.push({
-        date: moment().subtract(i, 'years').format('YYYY'),
-        revenue: Math.floor(Math.random() * 500000000) + 100000000,
-        orders: Math.floor(Math.random() * 5000) + 1000
-      })
-    }
-  }
-
-  return {
-    code: 200,
-    data: { dailyRevenues: dataPoints }
-  }
-}
+import { apiGetOrderStatistic, apiGetRevenueStatistic, apiGetTopProductRevenue, apiGetRecentOrders } from '@/api/dashboard'
+import {useConfig} from '@/config'
 
 // Reactive data
 const defaultFilter = {
@@ -502,38 +448,14 @@ const topProducts = ref([
 const recentOrders = ref([
   {
     id: 1004,
-    customerName: 'Nguyễn Văn A',
+    user: {
+      id: 'e570f804-375a-43bc-8b78-ba1fc19d79e9',
+      firstName: 'Nguyễn ',
+      lastName: 'Hoàng',
+    },
     totalAmount: 2529000,
     status: 'PENDING',
     createTime: '2025-01-15 14:30:00'
-  },
-  {
-    id: 1003,
-    customerName: 'Trần Thị B',
-    totalAmount: 1255000,
-    status: 'SUCCESS',
-    createTime: '2025-01-15 13:15:00'
-  },
-  {
-    id: 1002,
-    customerName: 'Lê Văn C',
-    totalAmount: 758000,
-    status: 'PROCESSING',
-    createTime: '2025-01-15 12:45:00'
-  },
-  {
-    id: 1001,
-    customerName: 'Phạm Thị D',
-    totalAmount: 3200000,
-    status: 'SUCCESS',
-    createTime: '2025-01-15 11:20:00'
-  },
-  {
-    id: 1000,
-    customerName: 'Hoàng Văn E',
-    totalAmount: 890000,
-    status: 'CANCELED',
-    createTime: '2025-01-15 10:30:00'
   }
 ])
 
@@ -557,13 +479,13 @@ const inventoryStats = ref({
 
 // Computed properties
 const totalRevenue = computed(() => {
-  return chartData.value.reduce((sum, item) => sum + item.revenue, 0)
+  return chartData.value.reduce((sum, item) => sum + Number(item.revenue), 0)
 })
 
 const pieData = computed(() => {
   return topProducts.value.slice(0, 5).map(product => ({
     name: product.name,
-    value: product.sold,
+    value: product.totalQuantity,
     color: getRandomColor()
   }))
 })
@@ -660,7 +582,8 @@ const getDataDefault = async () => {
     chartLoading.value = true
 
     const params = {
-      type: filter.type
+      type: filter.type,
+      limit: 10
     }
 
     // Xây dựng params theo loại filter
@@ -678,14 +601,15 @@ const getDataDefault = async () => {
       }
     } else if (filter.type === 3) {
       // Filter theo năm
-      params.yearFilter = {
+      params.monthYearFilter = {
         year: filter.selectedYear
       }
     }
 
-    const [orderResponse, revenueResponse] = await Promise.all([
+    const [orderResponse, revenueResponse, topProductSales] = await Promise.all([
       apiGetOrderStatistic(params),
-      apiGetRevenueStatistic(params)
+      apiGetRevenueStatistic(params),
+      apiGetTopProductRevenue(params)
     ])
 
     if (orderResponse.code === 200) {
@@ -693,7 +617,15 @@ const getDataDefault = async () => {
     }
 
     if (revenueResponse.code === 200) {
-      chartData.value = revenueResponse.data.dailyRevenues
+      if (params.type === 3) {
+        chartData.value = revenueResponse.data.monthlyRevenues || []
+      } else {
+        chartData.value = revenueResponse.data.dailyRevenues || []
+      }
+    }
+
+    if (topProductSales.code === 200) {
+      topProducts.value = topProductSales.data
     }
   } catch (error) {
     console.error('Error loading dashboard data:', error)
@@ -702,9 +634,24 @@ const getDataDefault = async () => {
   }
 }
 
+// recent orders
+const getRecentOrders = async () => {
+  const rs = await apiGetRecentOrders()
+  if (rs.code === 200) {
+    recentOrders.value = rs.data
+  }
+}
+
+const config = useConfig()
+const baseUrl = ref(config.VITE_PROXY_DOMAIN)
+const getImage = (url) => {
+  return url ? baseUrl.value + 'media-service/api/v1.0/images' + url.replace(/^\.\/uploads/, '/uploads') : null
+}
+
 // Lifecycle
 onMounted(() => {
   getDataDefault()
+  getRecentOrders()
 })
 
 watch(() => filter.type, () => {
@@ -963,6 +910,7 @@ watch(() => filter.selectedYear, () => {
   color: #3b82f6;
   font-size: 14px;
   padding: 0;
+  border: none !important;
 }
 
 // Product List
