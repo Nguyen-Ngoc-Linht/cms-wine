@@ -54,35 +54,35 @@
                 style="width: 100%"
                 :placeholder="$t('configUser.pleaseSelect')"
               >
-                <el-option key="1" label="Text" value="STRING"/>
-                <el-option key="1" label="Number" value="Number"/>
+                <el-option key="1" label="Văn bản / Nội dung" value="STRING"/>
+                <el-option key="2" label="Số lượng / Giá trị số" value="NUMBER"/>
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="24">
-            <el-form-item
-              class="custom mb-5"
-              label="Tìm kiếm theo"
-              prop="typeSearch"
-              style="display: inline-block; width: 100%"
-            >
-              <el-select
-                v-model="infoAttributes.typeSearch"
-                clearable
-                filterable
-                collapse-tags
-                style="width: 100%"
-                :placeholder="$t('configUser.pleaseSelect')"
-              >
-                <el-option
-                  v-for="type in lstTypeSearch"
-                  :key="type.id"
-                  :label="type.name"
-                  :value="type.value"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
+<!--          <el-col :span="24">-->
+<!--            <el-form-item-->
+<!--              class="custom mb-5"-->
+<!--              label="Tìm kiếm theo"-->
+<!--              prop="typeSearch"-->
+<!--              style="display: inline-block; width: 100%"-->
+<!--            >-->
+<!--              <el-select-->
+<!--                v-model="infoAttributes.typeSearch"-->
+<!--                clearable-->
+<!--                filterable-->
+<!--                collapse-tags-->
+<!--                style="width: 100%"-->
+<!--                :placeholder="$t('configUser.pleaseSelect')"-->
+<!--              >-->
+<!--                <el-option-->
+<!--                  v-for="type in lstTypeSearch"-->
+<!--                  :key="type.id"-->
+<!--                  :label="type.name"-->
+<!--                  :value="type.value"-->
+<!--                />-->
+<!--              </el-select>-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
         </el-row>
       </el-form>
       <hr class="margin-bottom-24 mt-3"/>

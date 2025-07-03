@@ -35,6 +35,9 @@
           :page="filter.page"
           :size="filter.size"
         >
+          <template #dataType="{ row }">
+            <span>{{ dataTypeMap[row.dataType] || 'Không xác định' }}</span>
+          </template>
           <template #action="{ row }">
               <span
                 @click.stop="handleEditAttributes(row)"
@@ -133,11 +136,11 @@ const fields = ref([
     label: 'Loại dữ liệu',
     prop: 'dataType',
   },
-  {
-    key: 'typeSearch',
-    label: 'Tìm kiếm theo',
-    prop: 'typeSearch',
-  },
+  // {
+  //   key: 'typeSearch',
+  //   label: 'Tìm kiếm theo',
+  //   prop: 'typeSearch',
+  // },
   {
     key: 'action',
     label: 'Thao tác',
@@ -222,6 +225,12 @@ const handleSizeChange = size => {
 const handlePageChange = page => {
   filter.page = page
   getList()
+}
+const dataTypeMap = {
+  STRING: 'Văn bản / Nội dung',
+  NUMBER: 'Số lượng / Giá trị số',
+  BOOLEAN: 'Đúng/Sai',
+  DATE: 'Ngày tháng',
 }
 </script>
 
