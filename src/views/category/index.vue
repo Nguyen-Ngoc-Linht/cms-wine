@@ -35,6 +35,12 @@
           :page="filter.page"
           :size="filter.size"
         >
+          <template #isShowHome="{ row }">
+            <span>{{ row.isShowHome ? 'Có' : 'Không' }}</span>
+          </template>
+          <template #origin="{ row }">
+            <span>{{ originMap[row.origin] || 'Không rõ' }}</span>
+          </template>
           <template #action="{ row }">
               <span
                 @click.stop="openEditCategory(row)"
@@ -228,6 +234,12 @@ const handleSizeChange = size => {
 const handlePageChange = page => {
   filter.page = page
   getList()
+}
+
+const originMap = {
+  1: 'Pháp',
+  2: 'Ý',
+  3: 'Chile',
 }
 </script>
 

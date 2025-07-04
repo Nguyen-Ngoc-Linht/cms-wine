@@ -139,7 +139,7 @@ const getUser = async () => {
 const connectWs = () => {
   console.log('hahahahah')
   connectWebSocket({
-    serverUrl: '103.154.62.40:8007',
+    serverUrl: 'ws.doantotnghiep.io.vn',
     path: '/api/v1.0/ws',
     topics: ['/topic/admin-system/user/' + userInfo.value.userId + '/notifications'],
     onMessage: (topic, data, raw) => {

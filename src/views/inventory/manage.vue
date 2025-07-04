@@ -59,7 +59,7 @@
           :size="filter.size"
         >
           <template #price="{ row }">
-            <span>{{ formatNumber(row.price, '.') + ' VND' }}</span>
+            <span>{{ formatNumber(row.price, '.') }}</span>
           </template>
           <template #active="{ row }">
             <span>{{ row.active === true ? 'Hoạt động' : 'Ngừng hoạt động'}}</span>
@@ -257,7 +257,7 @@ const fields = ref([
   },
   {
     key: 'price',
-    label: 'Giá bán',
+    label: 'Giá bán (VND)',
     prop: 'price',
   },
   {

@@ -54,15 +54,5 @@ export default {
         permissions: [''],
       },
     },
-    {
-      path: 'product-view',
-      name: 'communication-product-view',
-      component: () => import('@/views/product/manage.vue'),
-      meta: {
-        title: 'Sản phẩm truyền thông',
-        noCache: true,
-        permissions: [''],
-      },
-    },
   ],
 }

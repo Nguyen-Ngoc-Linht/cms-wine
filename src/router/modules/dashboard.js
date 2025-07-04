@@ -15,7 +15,7 @@ export default {
     {
       path: '',
       name: 'dashboard-ch',
-      component: () => import('@/views/dashboard/index.vue'),
+      component: () => import('@/views/dashboard/index-bk.vue'),
       meta: {
         title: 'Trang chủ',
         noCache: false,

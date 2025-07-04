@@ -15,7 +15,7 @@ export default {
     {
       path: '',
       name: 'order-manage',
-      component: () => import('@/views/order/index.vue'),
+      component: () => import('@/views/order/manage.vue'),
       meta: {
         title: 'Quản lý đơn hàng',
         noCache: false,

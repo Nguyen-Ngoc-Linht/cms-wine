@@ -11,7 +11,7 @@ let stompClient = null
  * @param {function} options.onMessage - Hàm callback xử lý khi nhận message
  */
 export const connectWebSocket = options => {
-  const fullUrl = `ws://${options.serverUrl}${options.path}`
+  const fullUrl = `wss://${options.serverUrl}${options.path}`
   const socket = new WebSocket(fullUrl)
 
   console.log('fullUrl', fullUrl)

@@ -41,25 +41,5 @@ export default {
         permissions: [''],
       },
     },
-    {
-      path: 'attributes',
-      name: 'product-attributes1',
-      component: () => import('@/views/attributes/index.vue'),
-      meta: {
-        title: 'Quản lý giao diện',
-        noCache: true,
-        permissions: [''],
-      },
-    },
-    {
-      path: 'attributes',
-      name: 'product-attributes2',
-      component: () => import('@/views/attributes/index.vue'),
-      meta: {
-        title: 'Lịch sử hoạt động',
-        noCache: true,
-        permissions: [''],
-      },
-    },
   ],
 }
