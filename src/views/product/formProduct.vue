@@ -123,28 +123,27 @@
               </el-form-item>
             </el-col>
             <el-col :span="24">
+              <el-form-item label="Mô tả ngắn">
+                <el-input
+                  type="textarea"
+                  v-model="infoProduct.descriptionShort"
+                  :autosize="{minRows: 4, maxRows: 6}"
+                  placeholder="Nhập mô tả sản phẩm"
+                  maxlength="1000"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
               <description-product
                 :name-product="infoProduct.name"
                 :tag-name="infoProduct.category?.name"
                 v-model:description="infoProduct.description"
               ></description-product>
-<!--              <el-form-item-->
-<!--                prop="description"-->
-<!--                label="Mô tả sản phẩm"-->
-<!--                style="display: inline-block; width: 100%;"-->
-<!--              >-->
-<!--                <el-input-->
-<!--                  v-model="infoProduct.description"-->
-<!--                  type="textarea"-->
-<!--                  show-word-limit-->
-<!--                  maxlength="5000"-->
-<!--                  :autosize="{ minRows: 4, maxRows: 5 }"-->
-<!--                ></el-input>-->
-<!--              </el-form-item>-->
             </el-col>
             <el-col :span="24" class="mt-3">
               <h6 class="font-bold text-base custom">
-                Ảnh sản phẩm
+                Ảnh sản phẩm (Yêu cầu ảnh xóa nền - tỉ lệ ảnh tương đương từ 6/10 - 7.2/10)
               </h6>
               <el-upload
                 v-model:file-list="infoProduct.listImage"
@@ -172,6 +171,18 @@
                   ({{ $t('configUser.importLimitAndType', ['Jpg/Png', '10MB']) }})
                 </p>
               </el-upload>
+            </el-col>
+            <el-col :span="24" class="mt-3">
+              <h6 class="font-bold text-base custom">
+                Mô tả chi tiết thông số
+              </h6>
+              <Parameter v-model:parameters="infoProduct.parameters"></Parameter>
+            </el-col>
+            <el-col :span="24" class="mt-3">
+              <h6 class="font-bold text-base custom">
+                Điểm chứng chỉ quốc tế
+              </h6>
+              <Certificate v-model:certificates="infoProduct.certificates" :user-id="user.userId"></Certificate>
             </el-col>
             <div class="w-full my-2 px-3">
               <el-button @click="showAddVariants" class="bg-outline-info text--info mb-2">Thêm loại sản phẩm</el-button>
@@ -254,6 +265,8 @@ import ModalVariant from '@/views/product/component/ModalVariant.vue'
 import {formatNumber} from '@/utils'
 import {useConfig} from '@/config'
 import DescriptionProduct from '@/views/product/component/DescriptionProduct.vue'
+import Parameter from '@/views/product/component/Parameter.vue'
+import Certificate from '@/views/product/component/Certificate.vue'
 
 const props = defineProps({
   isView: {
@@ -362,15 +375,16 @@ const handleAddProduct = async () => {
     ])
     processing.value = true
     const params = formatValidValue()
-    const rs = await apiCreateProduct(params)
-    if (rs.code === 201) {
-      ElMessage({
-        message: 'Thêm sản phẩm thành công',
-        type: 'success',
-        duration: 3 * 1000,
-      })
-      backProduct()
-    }
+    console.log(infoProduct.value, 'log ddaay', params)
+    // const rs = await apiCreateProduct(params)
+    // if (rs.code === 201) {
+    //   ElMessage({
+    //     message: 'Thêm sản phẩm thành công',
+    //     type: 'success',
+    //     duration: 3 * 1000,
+    //   })
+    //   backProduct()
+    // }
     processing.value = false
   } catch (e) {
     processing.value = false
@@ -384,7 +398,7 @@ const handleUpdateProduct = async () => {
     ])
     processing.value = true
     const params = formatValidValueUpdate()
-    console.log(params, 'day')
+    console.log(infoProduct.value, 'log ddaay', params)
     const rs = await apiUpdateProduct(id_product.value, params)
     if (rs.code === 200) {
       ElMessage({
@@ -443,6 +457,7 @@ const formatValidValue = () => {
     name: infoProduct.value.name,
     title: infoProduct.value.title,
     description: JSON.stringify(infoProduct.value.description),
+    parameters: JSON.stringify(infoProduct.value.parameters),
     categoryId: infoProduct.value.category.id,
     attributes: attributesProductLst,
     images: infoProduct.value.images,
@@ -472,6 +487,7 @@ const formatValidValueUpdate = () => {
     name: infoProduct.value.name,
     title: infoProduct.value.title,
     description: JSON.stringify(infoProduct.value.description),
+    parameters: JSON.stringify(infoProduct.value.parameters),
     categoryId: infoProduct.value.category.id,
     attributes: attributesProductLst,
     images: infoProduct.value.images,
@@ -495,6 +511,7 @@ const convertDataProduct = (productData) => {
   })
   console.log(JSON.parse(infoProduct.value.description), 'mo ta day')
   infoProduct.value.description = JSON.parse(infoProduct.value.description)
+  infoProduct.value.parameters = JSON.parse(infoProduct.value.parameters)
 }
 // Thuộc tính và biến thể
 const setAttribute = (selectedAttributes) => {
