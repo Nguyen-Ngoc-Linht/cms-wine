@@ -6,12 +6,22 @@
         <el-form-item label="Tên chứng chỉ">
           <el-input v-model="certificate.name" placeholder="Vui lòng nhập tên chứng chỉ"></el-input>
         </el-form-item>
-        <el-form-item label="Điểm chứng chỉ (thang điểm 100)">
-          <el-input type="number" v-model="certificate.score" placeholder="Vui lòng nhập điểm chứng chỉ"></el-input>
-        </el-form-item>
+        <el-row :gutter="6">
+          <el-col :span="12">
+            <el-form-item label="Điểm chứng chỉ">
+              <el-input type="number" v-model="certificate.score" placeholder="Vui lòng nhập điểm chứng chỉ"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="Thang điểm">
+              <el-input type="number" v-model="certificate.scoreMax" placeholder="Vui lòng nhập điểm chứng chỉ"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="Ảnh chứng chỉ (ảnh vuông tỉ lị 1x1 - định dạng png - 512x512)">
           <upload-image-product v-model="certificate.image" :user-id="userId" :is-edit="true"></upload-image-product>
         </el-form-item>
+        <el-button @click="deleteCertificate(index)" class="bg-outline-danger text--danger my-2">Xóa chứng chỉ</el-button>
       </el-col>
     </el-row>
   </div>
@@ -61,7 +71,12 @@ const addCertificate = async () => {
   arrCertificate.value.push({
     name: '',
     score: '',
+    scoreMax: '',
     image: ''
   })
+}
+
+const deleteCertificate = (index) => {
+  arrCertificate.value.splice(index, 1)
 }
 </script>

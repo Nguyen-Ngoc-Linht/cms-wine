@@ -15,6 +15,7 @@
             />
           </div>
         </el-form-item>
+        <el-button @click="deleteParameter(index)" class="bg-outline-danger text--danger my-2">Xóa thông số</el-button>
       </el-col>
     </el-row>
   </div>
@@ -83,5 +84,9 @@ const addParameter = async () => {
     title: '',
     description: ''
   })
+}
+
+const deleteParameter = (index) => {
+  arrParameter.value.splice(index, 1)
 }
 </script>

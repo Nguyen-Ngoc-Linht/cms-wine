@@ -143,7 +143,7 @@
             </el-col>
             <el-col :span="24" class="mt-3">
               <h6 class="font-bold text-base custom">
-                Ảnh sản phẩm (Yêu cầu ảnh xóa nền - tỉ lệ ảnh tương đương từ 6/10 - 7.2/10)
+                Ảnh sản phẩm (Yêu cầu ảnh xóa nền - tỉ lệ ảnh tương đương từ 6:10 - 7.2:10 hoặc 515x729px)
               </h6>
               <el-upload
                 v-model:file-list="infoProduct.listImage"
@@ -376,15 +376,15 @@ const handleAddProduct = async () => {
     processing.value = true
     const params = formatValidValue()
     console.log(infoProduct.value, 'log ddaay', params)
-    // const rs = await apiCreateProduct(params)
-    // if (rs.code === 201) {
-    //   ElMessage({
-    //     message: 'Thêm sản phẩm thành công',
-    //     type: 'success',
-    //     duration: 3 * 1000,
-    //   })
-    //   backProduct()
-    // }
+    const rs = await apiCreateProduct(params)
+    if (rs.code === 201) {
+      ElMessage({
+        message: 'Thêm sản phẩm thành công',
+        type: 'success',
+        duration: 3 * 1000,
+      })
+      backProduct()
+    }
     processing.value = false
   } catch (e) {
     processing.value = false
@@ -458,9 +458,11 @@ const formatValidValue = () => {
     title: infoProduct.value.title,
     description: JSON.stringify(infoProduct.value.description),
     parameters: JSON.stringify(infoProduct.value.parameters),
+    certificates: JSON.stringify(infoProduct.value.certificates),
     categoryId: infoProduct.value.category.id,
     attributes: attributesProductLst,
     images: infoProduct.value.images,
+    descriptionShort: infoProduct.value.descriptionShort,
     variants: variant
   }
 }
@@ -488,9 +490,11 @@ const formatValidValueUpdate = () => {
     title: infoProduct.value.title,
     description: JSON.stringify(infoProduct.value.description),
     parameters: JSON.stringify(infoProduct.value.parameters),
+    certificates: JSON.stringify(infoProduct.value.certificates),
     categoryId: infoProduct.value.category.id,
     attributes: attributesProductLst,
     images: infoProduct.value.images,
+    descriptionShort: infoProduct.value.descriptionShort,
     variants: variant,
     isUpdate: true,
   }
@@ -512,6 +516,7 @@ const convertDataProduct = (productData) => {
   console.log(JSON.parse(infoProduct.value.description), 'mo ta day')
   infoProduct.value.description = JSON.parse(infoProduct.value.description)
   infoProduct.value.parameters = JSON.parse(infoProduct.value.parameters)
+  infoProduct.value.certificates = JSON.parse(infoProduct.value.certificates)
 }
 // Thuộc tính và biến thể
 const setAttribute = (selectedAttributes) => {
