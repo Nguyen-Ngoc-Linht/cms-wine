@@ -515,7 +515,11 @@ const convertDataProduct = (productData) => {
   })
   console.log(JSON.parse(infoProduct.value.description), 'mo ta day')
   infoProduct.value.description = JSON.parse(infoProduct.value.description)
-  infoProduct.value.parameters = JSON.parse(infoProduct.value.parameters)
+  if (infoProduct.value.parameters && infoProduct.value.parameters !== '') {
+    infoProduct.value.parameters = JSON.parse(infoProduct.value.parameters)
+  } else {
+    infoProduct.value.parameters = []
+  }
   infoProduct.value.certificates = JSON.parse(infoProduct.value.certificates)
 }
 // Thuộc tính và biến thể
