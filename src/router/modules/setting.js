@@ -41,5 +41,25 @@ export default {
         permissions: [''],
       },
     },
+    {
+      path: 'policy',
+      name: 'policy',
+      component: () => import('@/views/system/policy.vue'),
+      meta: {
+        title: 'Chính sách hệ thống',
+        noCache: true,
+        permissions: [''],
+      },
+    },
+    {
+      path: 'banner',
+      name: 'banner',
+      component: () => import('@/views/system/banner.vue'),
+      meta: {
+        title: 'Banner',
+        noCache: true,
+        permissions: [''],
+      },
+    },
   ],
 }

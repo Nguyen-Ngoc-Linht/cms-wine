@@ -32,6 +32,7 @@
     "@logicflow/core": "^1.2.9",
     "@logicflow/extension": "^1.2.9",
     "@mojs/core": "^1.5.1",
+    "@tinymce/tinymce-vue": "^6.2.0",
     "@vueup/vue-quill": "^1.2.0",
     "@vueuse/core": "^10.2.0",
     "@wangeditor/core": "^1.1.19",

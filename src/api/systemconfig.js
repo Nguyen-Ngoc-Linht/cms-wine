@@ -1,43 +1,5 @@
 import http from '@/utils/request'
 
-export function fetchListCamera(data) {
-  return http.request({
-    method: 'get',
-    url: '/systemconfig/camera',
-    data,
-  })
-}
-
-export function fetchCategoryList(data) {
-  return http.request({
-    method: 'get',
-    url: '/systemconfig/category',
-    data,
-  })
-}
-
-export function apiBackupConfig(data) {
-  return http.request({
-    method: 'post',
-    url: '/sysd/database-backup/backup-interval',
-    data,
-  })
-}
-export function apiBackupHistory(data) {
-  return http.request({
-    method: 'post',
-    url: '/sysd/database-backup',
-    data,
-  })
-}
-
-export function apiLogConfig(data) {
-  return http.request({
-    method: 'post',
-    url: '/sysd/log-file',
-    data,
-  })
-}
 export function apiSessionConfig(data) {
   return http.request({
     method: 'post',
@@ -45,49 +7,28 @@ export function apiSessionConfig(data) {
     data,
   })
 }
-export function apiIpConfig(data) {
-  return http.request({
-    method: 'post',
-    url: '/sysd/permitted-ip-address',
-    data,
-  })
-}
 
-export function apiGetListService(data) {
-  return http.request({
-    method: 'post',
-    url: '/sysd/service',
-    data,
-  })
-}
-
-export function apiUserAction(data) {
-  return http.request({
-    method: 'post',
-    url: '/sysd/user-action',
-    data,
-  })
-}
-
-export function apiUserActionLog(data) {
-  return http.request({
-    method: 'post',
-    url: '/sysd/user-action/log',
-    data,
-  })
-}
-
-export function apiGetConfigCaptcha() {
+export function apiGetAllBanner(data) {
   return http.request({
     method: 'get',
-    url: '/category/captcha-config',
-  })
-}
-
-export function apiUpdateConfigCaptcha(data) {
-  return http.request({
-    method: 'put',
-    url: '/category/captcha-update',
+    url: '/wine-service/api/v1.0/managements/banners/find-all',
     data,
   })
 }
+
+export function apiGetSystemConfig(data) {
+  return http.request({
+    method: 'post',
+    url: '/wine-service/api/v1.0/managements/system-params/get-by-code',
+    data,
+  })
+}
+
+export function apiUpdateSystemConfig(data) {
+  return http.request({
+    method: 'put',
+    url: '/wine-service/api/v1.0/managements/system-params',
+    data,
+  })
+}
+
