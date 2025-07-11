@@ -1,34 +1,9 @@
 <template>
   <div>
-<!--    <div class="flex flex-wrap gap-px-8 items-center justify-start paddingX-24 mt-5">-->
-<!--      <el-input-->
-<!--        v-model="filter.keyword"-->
-<!--        @keyup.enter="getList"-->
-<!--        :placeholder="t('el.transfer.filterPlaceholder')"-->
-<!--        class="w-full md:max-w-[30%] lg:max-w-[200px] short"-->
-<!--      >-->
-<!--      </el-input>-->
-<!--      <el-date-picker-->
-<!--        v-model="filter.timeSearch"-->
-<!--        type="daterange"-->
-<!--        :start-placeholder="t('el.datepicker.startTime')"-->
-<!--        :range-separator="t('el.datepicker.to')"-->
-<!--        :end-placeholder="t('el.datepicker.endTime')"-->
-<!--        clearable-->
-<!--        value-format="YYYY-MM-DD"-->
-<!--        format="DD/MM/YYYY"-->
-<!--        class="w-full md:max-w-[30%] lg:max-w-[360px] flex-grow-0"-->
-<!--      />-->
-<!--      <el-button-->
-<!--        class="el-button&#45;&#45;main"-->
-<!--        @click="getList()"-->
-<!--      >{{ t('configUser.search') }}</el-button-->
-<!--      >-->
-<!--    </div>-->
     <div class="flex items-center justify-between paddingX-24 mt-3">
       <div class="flex gap-px-8 items-center">
         <el-button
-          @click.stop="handleAddProduct"
+          @click.stop="handleAddBanner"
           text
           size="default"
           class="!p-0"
@@ -60,13 +35,7 @@
           :page="filter.page"
           :size="filter.size"
         >
-          <template #category="{ row }">
-            <span>{{ row.category.name }}</span>
-          </template>
-          <template #viewCount="{ row }">
-            <p class="text-center">{{ row.viewCount }}</p>
-          </template>
-          <template #image="{ row }">
+          <template #imageUrl="{ row }">
             <img
               v-if="getPrimaryImage(row)"
               :src="getPrimaryImage(row)"
@@ -77,7 +46,7 @@
           </template>
           <template #action="{ row }">
               <span
-                @click.stop="handleEditProduct(row)"
+                @click.stop="handleEditBanner(row)"
                 class="delete-member pointer ms-2 me-3"
               >
                 <svg-icon
@@ -110,21 +79,21 @@
     <Dialog
       :show="showDialog"
       :appendToBody="true"
-      :width="'682'"
+      :width="'820'"
       :title="titleDialog"
       @closeDialog="handleCloseDialog"
     >
       <template v-slot:content>
-        <form-category :type-dialog="typeDialog" :category-info="infoCategory" @closeUpdate="handleCloseDialog"></form-category>
+        <banner-dialog :info-banner="infoBanner" :typeDialog="typeDialog" :user_id="user.userId" @closeUpdate="handleCloseDialog"></banner-dialog>
       </template>
     </Dialog>
     <el-dialog
       v-model="deleteCategoryDialog"
-      title="Xóa sản phẩm"
+      title="Xóa banner"
       width="500"
       align-center
     >
-      <span>Bạn có chắc chắn muốn xóa sản phẩm đã chọn</span>
+      <span>Bạn có chắc chắn muốn xóa banner đã chọn</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button
@@ -135,7 +104,7 @@
           </el-button>
           <el-button
             class="el-button--main"
-            @click="handleDeleteProduct()"
+            @click="handleDeleteBanner()"
           >
             {{ $t('el.datepicker.confirm') }}
           </el-button>
@@ -154,12 +123,14 @@ import TableViolation from '@/components/Table/index.vue'
 import {apiDeleteProduct} from '@/api/product'
 import Dialog from '@/components/Dialog/index.vue'
 import { ElMessage } from 'element-plus'
-import FormCategory from '@/views/category/FormCategory.vue'
 import {useRouter} from 'vue-router'
 import {useConfig} from '@/config'
-import {apiGetAllBanner} from '@/api/systemconfig'
+import {apiDeleteBanner, apiGetAllBanner} from '@/api/systemconfig'
+import BannerDialog from '@/views/system/BannerDialog.vue'
 const { t } = useI18n()
 const router = useRouter()
+const user = ref({})
+
 const fields = ref([
   {
     key: 'title',
@@ -210,12 +181,14 @@ const defaultFilter = {
   keyword: '',
 }
 const filter = reactive(cloneDeep(defaultFilter))
+
 const showDialog = ref(false)
 const titleDialog = ref('')
 const typeDialog = ref('add')
-const infoCategory = ref({})
+const infoBanner = ref({})
 
 onMounted(() => {
+  user.value = JSON.parse(localStorage.getItem('userInfo'))
   getList()
 })
 
@@ -231,35 +204,41 @@ const getList = async () => {
   }
   const rs = await apiGetAllBanner()
   if (rs.code === 200) {
-    list.value = rs.data.content
-    filter.total = rs.data.totalElements
+    list.value = rs.data
+    filter.total = rs.data.length
   }
   listLoading.value = false
 }
 const config = useConfig()
 const baseUrl = ref(config.VITE_PROXY_DOMAIN)
 const getPrimaryImage = (row) => {
-  const img = row.images?.find(i => i.isPrimary) || row.images?.[0]
-  return img ? baseUrl.value + 'media-service/api/v1.0/images' + img.url.replace(/^\.\/uploads/, '/uploads') : null
+  const img = row.imageUrl
+  return img ? baseUrl.value + 'media-service/api/v1.0/images' + img.replace(/^\.\/uploads/, '/uploads') : null
 }
 
-const handleAddProduct = () => {
-  router.push('/product/manage/add')
+const handleAddBanner = () => {
+  showDialog.value = true
+  infoBanner.value = {}
+  typeDialog.value = 'add'
+  titleDialog.value = 'Thêm banner'
 }
-const handleEditProduct = (data) => {
-  router.push(`/product/manage/edit/${data.id}`)
+const handleEditBanner = (data) => {
+  showDialog.value = true
+  infoBanner.value = data
+  typeDialog.value = 'edit'
+  titleDialog.value = 'Sửa banner'
 }
 const openDialogDelete = (data) => {
-  infoCategory.value = data
+  infoBanner.value = data
   deleteCategoryDialog.value = true
 }
-const handleDeleteProduct = async () => {
+const handleDeleteBanner = async () => {
   try {
-    const rs = await apiDeleteProduct(infoCategory.value.id)
+    const rs = await apiDeleteBanner(infoBanner.value.id)
     if (rs.code === 200) {
-      ElMessage.success('Xóa sản phầm thành công')
+      ElMessage.success('Xóa Banner thành công')
     } else {
-      ElMessage.error('Xóa sản phẩm thất bại')
+      ElMessage.error('Xóa Banner thất bại')
     }
     deleteCategoryDialog.value = false
     await getList()
@@ -289,9 +268,9 @@ const handlePageChange = page => {
   color: #0078d4;
 }
 .product-image {
-  width: 100px;
+  width: 180px;
   height: 100px;
-  object-fit: contain;
+  object-fit: cover;
   border-radius: 8px;
 }
 </style>

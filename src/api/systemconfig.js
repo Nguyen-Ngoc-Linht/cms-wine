@@ -15,7 +15,26 @@ export function apiGetAllBanner(data) {
     data,
   })
 }
-
+export function apiCreateBanner(data) {
+  return http.request({
+    method: 'post',
+    url: '/wine-service/api/v1.0/managements/banners',
+    data,
+  })
+}
+export function apiUpdateBanner(id_banner, data) {
+  return http.request({
+    method: 'put',
+    url: `/wine-service/api/v1.0/managements/banners/${id_banner}`,
+    data,
+  })
+}
+export function apiDeleteBanner(id_banner) {
+  return http.request({
+    method: 'delete',
+    url: `/wine-service/api/v1.0/managements/banners/${id_banner}`,
+  })
+}
 export function apiGetSystemConfig(data) {
   return http.request({
     method: 'post',

@@ -10,7 +10,7 @@
       </el-button>
     </div>
     <Tinymce
-      ref="clausePolicy"
+      ref="clausePolicy2"
       v-model="contentPolicy"
       :height="800"
     ></Tinymce>
@@ -23,8 +23,8 @@ import {apiGetSystemConfig, apiUpdateSystemConfig} from '@/api/systemconfig'
 import {ElMessage} from 'element-plus'
 
 const contentPolicy = ref('')
-const clausePolicy = ref(null)
-clausePolicy.value = undefined
+const clausePolicy2 = ref(null)
+clausePolicy2.value = undefined
 const processing = ref(false)
 
 onMounted(() => {
@@ -39,7 +39,7 @@ const initData = async () => {
     const res = await apiGetSystemConfig(params)
     if (res.code === 200) {
       contentPolicy.value = res.data.value
-      clausePolicy.value.setContent(contentPolicy.value)
+      clausePolicy2.value.setContent(contentPolicy.value)
     }
   } catch (e) {
     console.log(e)
